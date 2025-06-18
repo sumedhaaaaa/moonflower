@@ -18,7 +18,7 @@ const Login = () => {
     if (res.ok) {
       localStorage.setItem("token", data.token);
       alert("Login successful!");
-      navigate("/dashboard"); // Redirect after login
+      navigate("/"); // Redirect after login
     } else {
       alert(data.message || "Login failed!");
     }

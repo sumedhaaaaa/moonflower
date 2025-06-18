@@ -1,20 +1,31 @@
 import React, { useState } from "react";
-import styled from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { FaGoogle, FaMicrosoft, FaApple, FaPhone } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa";
+
+const GlobalStyle = createGlobalStyle`
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    background: linear-gradient(to bottom, #F8A6D8, #FF7BAF);
+    min-height: 100vh;
+    overflow: hidden;
+  }
+`;
 
 const Container = styled.div`
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fafafa;
 `;
 
 const Card = styled.div`
-  background: #fff;
   border-radius: 24px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  box-shadow: 0 4px 32px rgba(0,0,0,0.25);
   padding: 48px 32px 32px 32px;
   width: 100%;
   max-width: 400px;
@@ -105,39 +116,109 @@ const SocialButton = styled.button`
 
 const Signup = () => {
   const [email, setEmail] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [verifying, setVerifying] = useState(false);
   const navigate = useNavigate();
 
-  const handleContinue = (e) => {
+  const handleSendOtp = async (e) => {
     e.preventDefault();
-    // You can add your signup logic here
-    alert("Continue with: " + email);
+    setError("");
+    setSuccess("");
+    try {
+      const response = await fetch('http://localhost:5000/api/send-otp', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+      const data = await response.json();
+      if (response.status === 404 && data.message && data.message.includes('User is not registered')) {
+        window.alert('User is not registered. Please sign up first.');
+        navigate('/signup');
+        return;
+      }
+      if (!response.ok) {
+        setError(data.message || "Failed to send OTP");
+        return;
+      }
+      setOtpSent(true);
+      setSuccess("OTP sent to your email!");
+    } catch (err) {
+      setError(err.message || "Failed to send OTP. Please try again.");
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setVerifying(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/verify-otp', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data.message || "Failed to verify OTP");
+        setVerifying(false);
+        return;
+      }
+      setSuccess("Email verified successfully!");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1200);
+    } catch (err) {
+      setError(err.message || "Invalid OTP. Please try again.");
+    }
+    setVerifying(false);
   };
 
   return (
-    <Container>
-      <Card>
-        <Title>Create an account</Title>
-        <form style={{ width: "100%" }} onSubmit={handleContinue}>
-          <Input
-            type="email"
-            placeholder="Email address"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-          />
-          <ContinueButton type="submit">Continue</ContinueButton>
-        </form>
-        <LoginLink>
-          Already have an account?
-          <a href="#" onClick={e => { e.preventDefault(); navigate("/login"); }}>Log in</a>
-        </LoginLink>
-        <Divider><span>or</span></Divider>
-        <SocialButton><FaPhone /> Continue with phone</SocialButton>
-        <SocialButton><FaGoogle /> Continue with Google</SocialButton>
-        <SocialButton><FaMicrosoft /> Continue with Microsoft Account</SocialButton>
-        <SocialButton><FaApple /> Continue with Apple</SocialButton>
-      </Card>
-    </Container>
+    <>
+      <GlobalStyle />
+      <Container>
+        <Card>
+          <Title>Create an account</Title>
+          {!otpSent ? (
+            <form style={{ width: "100%" }} onSubmit={handleSendOtp}>
+              <Input
+                type="email"
+                placeholder="Email address"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+              />
+              <ContinueButton type="submit">Continue</ContinueButton>
+            </form>
+          ) : (
+            <form style={{ width: "100%" }} onSubmit={handleVerifyOtp}>
+              <Input
+                type="text"
+                placeholder="Enter OTP"
+                value={otp}
+                onChange={e => setOtp(e.target.value)}
+                required
+              />
+              <ContinueButton type="submit" disabled={verifying}>{verifying ? "Verifying..." : "Verify OTP"}</ContinueButton>
+            </form>
+          )}
+          {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
+          {success && <div style={{ color: 'green', marginBottom: 8 }}>{success}</div>}
+          <LoginLink>
+            Already have an account?
+            <a href="#" onClick={e => { e.preventDefault(); navigate("/login"); }}>Log in</a>
+          </LoginLink>
+          <Divider><span>or</span></Divider>
+          <SocialButton onClick={() => window.location.href = 'http://localhost:8000/api/auth/google'}>
+            <FaGoogle /> Continue with Google
+          </SocialButton>
+        </Card>
+      </Container>
+    </>
   );
 };
 

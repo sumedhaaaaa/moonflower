@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Logo from "../assets/logo.png"; // Website Logo
 import ProfileIcon from "../assets/profile.png"; // Profile Icon
@@ -59,6 +59,20 @@ const SettingsIconImage = styled.img`
 
 function Sidebar() {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Fetch user info from session-based endpoint
+    fetch("http://localhost:8000/api/auth/me", {
+      credentials: "include"
+    })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && data.username) setUser(data);
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <SidebarContainer>
       <LogoImage src={Logo} alt="MoonFlower Logo" />
@@ -68,8 +82,8 @@ function Sidebar() {
           <SettingsIconImage src={SettingsIcon} alt="Settings" />
         </IconButton>
         {/* Profile Button (Same Size) */}
-        <IconButton onClick={() => navigate("/signup")}>
-          <IconImage src={ProfileIcon} alt="Profile" />
+        <IconButton onClick={() => navigate("/signup")}> 
+          <IconImage src={user && user.photo ? user.photo : ProfileIcon} alt="Profile" />
         </IconButton>
       </SidebarBottom>
     </SidebarContainer>

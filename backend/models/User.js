@@ -6,12 +6,33 @@ const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
+      unique: true,
+      sparse: true,
+    },
+    email: {
+      type: String,
       required: true,
       unique: true,
     },
     password: {
       type: String,
-      required: true,
+      // Not required for Google OAuth users
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    phone: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    otp: {
+      type: String,
+    },
+    photo: {
+      type: String,
     },
   },
   { timestamps: true }
