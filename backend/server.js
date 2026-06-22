@@ -157,6 +157,15 @@ app.use("/api/user", userRoutes);
 app.use("/api/articles", articleRoutes);
 app.use('/api/auth', googleAuthRoutes);
 
+// Update CSP to allow images from self, Google, and data URIs
+app.use((req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; img-src 'self' https://lh3.googleusercontent.com data:;"
+  );
+  next();
+});
+
 app.listen(8000, () => {
   console.log(`Server is listening at http://localhost:8000`);
 });

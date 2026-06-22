@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import Greeting from "./Greetings";
 import PeriodTracker from "./PeriodTracker";
@@ -20,11 +20,12 @@ const GlobalStyle = createGlobalStyle`
     min-height: 100vh; /* Changed height to min-height so it can expand if needed */
     display: flex;
     flex-direction: column; /* Stack elements vertically */
-    overflow: hidden; /* Removed scrolling */
+    overflow-x: hidden;
+    overflow-y: auto; /* Allow vertical scrolling so sections below are visible */
   }
 `;
 
-// ✅ NEW: Created a parent container to wrap both HomeContainer and ExpertInsightsContainer
+//  NEW: Created a parent container to wrap both HomeContainer and ExpertInsightsContainer
 const MainContainer = styled.div`
   display: flex;
   flex-direction: column; /* Stack HomeContainer and ExpertInsightsContainer */
@@ -32,7 +33,7 @@ const MainContainer = styled.div`
   width: 100%;
 `;
 
-// ✅ MODIFIED: Home container now takes up available space but doesn't prevent ExpertInsights from being displayed
+//  MODIFIED: Home container now takes up available space but doesn't prevent ExpertInsights from being displayed
 const HomeContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -41,29 +42,42 @@ const HomeContainer = styled.div`
   padding: 20px;
   width: calc(100vw - 120px);
   flex-direction: column;
-  align-items: center;
-  min-height: 100vh; /* Ensures full height */
+  align-items: flex-start;
+  
+  
+  @media (max-width: 1024px) {
+    width: calc(100vw - 90px);
+    padding: 16px;
+  }
+  
+  @media (max-width: 768px) {
+    width: calc(100vw - 90px);
+    padding: 14px;
+  }
+  
+  @media (max-width: 480px) {
+    width: calc(100vw - 90px);
+    padding: 12px 10px;
+  }
 `;
 
 // Left Section (Greeting + GIF)
 const LeftSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 20px;
+  display: none;
 `;
 
-// GIF Container
-const AnimationContainer = styled.div`
-  position: absolute;
-  left: 200px;
+// Animation card to align with tracker and feeling box
+const AnimationBox = styled.div`
+  height: 280px;
+  width: 240px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  margin-top: 80px;
-  transform: translateX(-40px);
-  z-index: 2;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 15px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 12px;
 
   img {
     width: 200px;
@@ -72,17 +86,30 @@ const AnimationContainer = styled.div`
     object-fit: cover;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
   }
+
+  @media (max-width: 1024px) {
+    height: auto;
+    width: 100%;
+    max-width: 360px;
+  }
 `;
 
 // Center Section (Tracker)
 const CenterSection = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
-  position: absolute;
-  top: 3%;
-  left: 54%;
-  transform: translateX(-50%);
+  align-items: center;   /* ✅ center children */
+  width: 100%;
+  max-width: 1200px;     /* ✅ limits width nicely */
+  margin: 0 auto;        /* ✅ centers entire section */
+
+  @media (max-width: 1024px) {
+    margin-top: 8px;
+  }
+  
+  @media (max-width: 768px) {
+    margin-top: 8px;
+  }
 `;
 
 const TrackerContainer = styled.div`
@@ -90,14 +117,53 @@ const TrackerContainer = styled.div`
   border-radius: 15px;
   background-color: rgba(255, 255, 255, 0.8);
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  position: absolute;
+  position: relative;
+  height: 280px; /* match row height on desktop */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 `;
 
-// ✅ MODIFIED: Expert Insights container now has margin-bottom to ensure visibility
+// Row that holds the tracker and the FeelingBox side-by-side on desktop
+const TrackerRow = styled.div`
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 24px;
+  
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+`;
+
+//  MODIFIED: Expert Insights container now has margin-bottom to ensure visibility
 const ExpertInsightsContainer = styled.div`
-  margin-top: 50px;
+  margin-left: 90px;                     /* ✅ SAME as HomeContainer */
+  width: calc(100vw - 120px);           /* ✅ SAME width logic */
+  padding: 30px 20px;
   text-align: center;
-  margin-bottom: 20px; /* Added margin to prevent overlap */
+  margin-top: 8px;
+  margin-bottom: 20px;
+  
+  min-height: 400px;
+
+  @media (max-width: 1024px) {
+    width: calc(100vw - 90px);
+    padding: 16px;
+  }
+
+  @media (max-width: 768px) {
+    width: calc(100vw - 90px);
+    padding: 14px;
+  }
+
+  @media (max-width: 480px) {
+    width: calc(100vw - 90px);
+    padding: 12px 10px;
+  }
 `;
 
 function Home() {
@@ -131,39 +197,39 @@ function Home() {
       <GlobalStyle />
       <Sidebar />
       
-      {/* ✅ NEW: Wrapped everything inside MainContainer */}
+      {/*  NEW: Wrapped everything inside MainContainer */}
       <MainContainer>
         
-        {/* ✅ MODIFIED: HomeContainer now sits inside MainContainer */}
+        {/*  MODIFIED: HomeContainer now sits inside MainContainer */}
         <HomeContainer>
-          {/* Left Section */}
-          <LeftSection>
-            <Greeting />
-            <AnimationContainer>
-              <img src={animation} alt="Heart Animation" />
-            </AnimationContainer>
-          </LeftSection>
+          {/* Left Section removed; greeting embedded in AnimationBox */}
 
           {/* Center Section */}
+          <Greeting/>
           <CenterSection>
-            <TrackerContainer>
-              {/* Show options only if logged in */}
-              {isLoggedIn && (
-                <div style={{ display: "flex", gap: "20px", marginBottom: "20px", justifyContent: "center" }}>
-                  <button onClick={() => navigate("/tracker-results")}>Track Now</button>
-                  {hasPeriodData && (
-                    <button onClick={() => navigate("/previous-results")}>View Previous Results</button>
-                  )}
-                </div>
-              )}
-              <PeriodTracker />
-            </TrackerContainer>
+            
+            <TrackerRow>
+              <AnimationBox>
+                <img src={animation} alt="Heart Animation" />
+              </AnimationBox>
+              <TrackerContainer>
+                {/* Show options only if logged in */}
+                {isLoggedIn && (
+                  <div style={{ display: "flex", gap: "20px", marginBottom: "20px", justifyContent: "center" }}>
+                    <button onClick={() => navigate("/tracker-results")}>Track Now</button>
+                    {hasPeriodData && (
+                      <button onClick={() => navigate("/previous-results")}>View Previous Results</button>
+                    )}
+                  </div>
+                )}
+                <PeriodTracker />
+              </TrackerContainer>
+              <FeelingBox />
+            </TrackerRow>
           </CenterSection>
-
-          <FeelingBox />
         </HomeContainer>
 
-        {/* ✅ MODIFIED: ExpertInsightsContainer is now inside MainContainer but outside HomeContainer */}
+        {/*  MODIFIED: ExpertInsightsContainer is now inside MainContainer but outside HomeContainer */}
         <ExpertInsightsContainer>
           <ExpertInsights />
         </ExpertInsightsContainer>

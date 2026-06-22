@@ -1,6 +1,9 @@
+body, #root, main {
+  background: linear-gradient(to bottom, #F8A6D8, #FF7BAF);
+}
+
 body {
-  background-color: #e0f2fe;
-  color: #1e3a8a;
+  background: linear-gradient(to bottom, #F8A6D8, #FF7BAF);
 }
 
 button {

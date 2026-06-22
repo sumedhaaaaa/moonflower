@@ -1,6 +1,107 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 
+
+//   width: 200px;
+//   height: 280px;
+//   background-color: #f897c2;
+//   border-radius: 15px;
+//   padding: 15px;
+//   text-align: center;
+//   position: absolute;
+//   right: 50px;
+//   top: 23%;
+//   transform: translateY(-50%);
+//   cursor: pointer;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: center;
+//   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+//   transition: transform 0.2s ease;
+
+//   &:hover {
+//     transform: translateY(-50%) scale(1.05);
+//   }
+
+//   h3 {
+//     font-size: 16px;
+//     color: white;
+//     margin-bottom: 30px;
+//   }
+
+//   img {
+//     width: 80px;
+//     height: 80px;
+//     margin-bottom: 30px;
+//   }
+
+//   p {
+//     color: white;
+//     font-weight: bold;
+//     margin-bottom: 15px;
+//   }
+  
+//   @media (max-width: 1024px) {
+//     position: relative;
+//     right: auto;
+//     top: auto;
+//     transform: none;
+//     margin: 20px auto;
+    
+//     &:hover {
+//       transform: scale(1.05);
+//     }
+//   }
+  
+//   @media (max-width: 768px) {
+//     width: 180px;
+//     height: 250px;
+//     padding: 12px;
+//     margin: 15px auto;
+    
+//     h3 {
+//       font-size: 14px;
+//       margin-bottom: 20px;
+//     }
+    
+//     img {
+//       width: 60px;
+//       height: 60px;
+//       margin-bottom: 20px;
+//     }
+    
+//     p {
+//       font-size: 14px;
+//       margin-bottom: 10px;
+//     }
+//   }
+  
+//   @media (max-width: 480px) {
+//     width: 160px;
+//     height: 220px;
+//     padding: 10px;
+//     margin: 10px auto;
+    
+//     h3 {
+//       font-size: 13px;
+//       margin-bottom: 15px;
+//     }
+    
+//     img {
+//       width: 50px;
+//       height: 50px;
+//       margin-bottom: 15px;
+//     }
+    
+//     p {
+//       font-size: 13px;
+//       margin-bottom: 8px;
+//     }
+//   }
+// `;
+
+
 const FeelingContainer = styled.div`
   width: 200px;
   height: 280px;
@@ -8,33 +109,48 @@ const FeelingContainer = styled.div`
   border-radius: 15px;
   padding: 15px;
   text-align: center;
-  position: absolute;
-  right: 50px;
-  top: 23%;
-  transform: translateY(-50%);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
-
+  transition: transform 0.2s ease;
+  
+  /* 👇 Controls the responsive spacing automatically */
+  width: 240px;
+  height: 280px;
+  
   h3 {
-    font-size: 16px;
-    color: white;
-    margin-bottom: 30px;
-  }
-
-  img {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 30px;
+    font-size: 30px;   /* ✅ smaller text */
+    font-weight: 500;
+    margin-bottom: 8px;
+    line-height: 1.2;
   }
 
   p {
-    color: white;
-    font-weight: bold;
-    margin-bottom: 15px;
+    font-size: 13px;
+  }
+
+  img {
+    width: 70px;
+    height: 70px;
+  }
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  @media (max-width: 1024px) {
+    margin: 4vw auto;
+  }
+
+  @media (max-width: 768px) {
+    margin: 5vw auto;
+  }
+
+  @media (max-width: 480px) {
+    margin: 6vw auto;
   }
 `;
 
@@ -51,6 +167,16 @@ const PopUpOverlay = styled.div.withConfig({
   background: rgba(0, 0, 0, 0.5);
   align-items: center;
   justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+  
+  @media (max-width: 768px) {
+    padding: 15px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 10px;
+  }
 `;
 
 const PopUpBox = styled.div`
@@ -62,7 +188,9 @@ const PopUpBox = styled.div`
   position: relative;
 
   h3 {
-    margin-bottom: 10px;
+    font-size: 14px;     /* ✅ smaller text */
+  margin-bottom: 8px;
+  line-height: 1.2;
   }
 
   input,
@@ -82,6 +210,56 @@ const PopUpBox = styled.div`
     color: white;
     border-radius: 5px;
     cursor: pointer;
+    transition: background 0.2s ease;
+    
+    &:hover {
+      background: #f897c2;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    width: 280px;
+    padding: 18px;
+    
+    h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    
+    input,
+    textarea {
+      padding: 10px;
+      margin: 4px 0;
+      font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    button {
+      padding: 10px 16px;
+      font-size: 14px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    width: 100%;
+    max-width: 280px;
+    padding: 15px;
+    
+    h3 {
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+    
+    input,
+    textarea {
+      padding: 8px;
+      margin: 3px 0;
+      font-size: 16px;
+    }
+    
+    button {
+      padding: 8px 14px;
+      font-size: 13px;
+    }
   }
 `;
 
@@ -95,6 +273,21 @@ const CloseButton = styled.button`
   padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
+  transition: background 0.2s ease;
+  
+  &:hover {
+    background: #ff3333;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 5px 10px;
+    font-size: 13px;
+  }
 `;
 
 const FeelingBox = () => {

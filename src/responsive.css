@@ -1,0 +1,69 @@
+/* Global responsive helpers – safe, non-destructive tweaks only */
+
+/* Inherit box-sizing for predictable sizing without changing layout */
+html {
+  box-sizing: border-box;
+}
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* Make media scale to their containers without forcing layout changes */
+img, video, canvas, svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Improve word wrapping on very narrow screens */
+body {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+/* Typography scales slightly to maintain readability without reflowing structure */
+h1 { font-size: clamp(1.6rem, 2.5vw + 1rem, 2.2rem); }
+h2 { font-size: clamp(1.3rem, 2.0vw + 0.8rem, 1.8rem); }
+h3 { font-size: clamp(1.1rem, 1.6vw + 0.7rem, 1.4rem); }
+p, li, a, button, input, label, span {
+  font-size: clamp(0.95rem, 1.2vw + 0.6rem, 1.05rem);
+}
+
+/* Buttons: keep touch targets comfortable without affecting layout widths */
+button {
+  line-height: 1.2;
+  padding: 0.5rem 0.9rem; /* subtle, won't break layout */
+}
+
+/* Narrow tablets */
+@media (max-width: 1024px) {
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+}
+
+/* Tablets and large phones */
+@media (max-width: 768px) {
+  /* Add small horizontal breathing room if a page has edge-to-edge sections */
+  body {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+/* Phones */
+@media (max-width: 480px) {
+  /* Reduce default margins to fit content without changing components */
+  body {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  /* Tighten headings slightly on very small screens */
+  h1 { letter-spacing: 0; }
+  h2 { letter-spacing: 0; }
+}
+
+
+

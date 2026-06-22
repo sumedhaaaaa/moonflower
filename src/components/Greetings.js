@@ -1,56 +1,84 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 
+// const GreetingContainer = styled.div`
+//   background-color: white;
+//   padding: 12px 16px;
+//   border-radius: 8px;
+//   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+//   font-size: 18px;
+//   font-weight: bold;
+//   color: black;
+//   width: fit-content;
+//   position: ${props => props.embedded ? 'relative' : 'absolute'};
+//   top: ${props => props.embedded ? 'auto' : '20px'};
+//   left: ${props => props.embedded ? 'auto' : '120px'}; /* Moves it further from the sidebar */
+//   z-index: 1001;
+//   margin-bottom: ${props => props.embedded ? '10px' : '0'};
+  
+//   @media (max-width: 1024px) {
+//     position: relative;
+//     top: auto;
+//     left: auto;
+//     margin-bottom: 20px;
+//   }
+  
+//   @media (max-width: 768px) {
+//     padding: 12px 16px;
+//     font-size: 18px;
+//     margin-bottom: 15px;
+//   }
+  
+//   @media (max-width: 480px) {
+//     padding: 10px 14px;
+//     font-size: 16px;
+//     margin-bottom: 10px;
+//   }
+// `;
+
 const GreetingContainer = styled.div`
-background-color: white;
-padding: 15px 20px;
-border-radius: 8px;
-box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-font-size: 20px;
-font-weight: bold;
-color: black;
-width: fit-content;
-position: absolute;
-top: 20px;
-left: 120px; /* Moves it further from the sidebar */
-z-index: 1001;
+  background-color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 18px;
+  font-weight: bold;
+  color: black;
+
+  width: fit-content;
+
+  /* ✅ DESKTOP (default) → LEFT ALIGN */
+  margin-left: 50px;
+  margin-bottom: 20px;
+  text-align: left;
+
+  /* ✅ TABLET / SMALL SCREEN */
+  @media (max-width: 1024px) {
+    margin: 0 auto 20px auto;   /* center */
+    text-align: center;
+  }
+
+  /* ✅ MOBILE */
+  @media (max-width: 768px) {
+    margin: 0 auto 15px auto;
+    text-align: center;
+  }
 `;
 
-
-const Greeting = () => {
+const Greeting = ({ embedded = false }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return; // Stop if no token is found
+    fetch("http://localhost:8000/api/auth/me", {
+      credentials: "include"
+    })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && data.username) setUser(data);
+      })
+      .catch(() => {});
+  }, []);
 
-    const fetchUser = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/user/me", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setUser(data);
-        } else {
-          console.error("Failed to fetch user");
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      }
-    };
-
-    fetchUser();
-  }, []); // Empty dependency array ensures it runs once when mounted
-
-
-  // useEffect (() => { 
-  //   setUser({firstName: "Subhajit"});
-  // },[]);
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour >= 4 && hour < 12) return "Good Morning";
@@ -60,9 +88,9 @@ const Greeting = () => {
   };
 
   return (
-    <GreetingContainer>
+    <GreetingContainer embedded={embedded}>
       {getGreeting()}
-      {user?.firstName ? `, ${user.firstName}` : ""}
+      {user?.username ? `, ${user.username}` : ""}
     </GreetingContainer>
   );
 };

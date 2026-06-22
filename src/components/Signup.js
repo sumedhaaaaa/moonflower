@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { FaGoogle } from "react-icons/fa";
@@ -12,7 +12,7 @@ const GlobalStyle = createGlobalStyle`
   body {
     background: linear-gradient(to bottom, #F8A6D8, #FF7BAF);
     min-height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
   }
 `;
 
@@ -21,6 +21,15 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px;
+  
+  @media (max-width: 768px) {
+    padding: 15px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 10px;
+  }
 `;
 
 const Card = styled.div`
@@ -32,12 +41,34 @@ const Card = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  background: white;
+  
+  @media (max-width: 768px) {
+    padding: 32px 24px 24px 24px;
+    max-width: 350px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 24px 16px 16px 16px;
+    max-width: 100%;
+    border-radius: 16px;
+  }
 `;
 
 const Title = styled.h2`
   font-size: 2rem;
   font-weight: 600;
   margin-bottom: 32px;
+  
+  @media (max-width: 768px) {
+    font-size: 1.75rem;
+    margin-bottom: 24px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
 `;
 
 const Input = styled.input`
@@ -48,6 +79,20 @@ const Input = styled.input`
   font-size: 1rem;
   margin-bottom: 20px;
   outline: none;
+  
+  &:focus {
+    border-color: #ff6699;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 12px 14px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  @media (max-width: 480px) {
+    padding: 10px 12px;
+    margin-bottom: 16px;
+  }
 `;
 
 const ContinueButton = styled.button`
@@ -62,8 +107,21 @@ const ContinueButton = styled.button`
   margin-bottom: 18px;
   cursor: pointer;
   transition: background 0.2s;
+  
   &:hover {
     background: #222;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 12px 0;
+    font-size: 1rem;
+    margin-bottom: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 10px 0;
+    font-size: 0.95rem;
+    margin-bottom: 14px;
   }
 `;
 
@@ -71,11 +129,22 @@ const LoginLink = styled.div`
   font-size: 1rem;
   margin-bottom: 18px;
   color: #444;
+  
   a {
     color: #007aff;
     text-decoration: none;
     margin-left: 4px;
     &:hover { text-decoration: underline; }
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+    margin-bottom: 14px;
   }
 `;
 
@@ -85,11 +154,30 @@ const Divider = styled.div`
   border-bottom: 1px solid #eee;
   line-height: 0.1em;
   margin: 18px 0 18px 0;
+  
   span {
     background: #fff;
     padding: 0 16px;
     color: #888;
     font-size: 0.95rem;
+  }
+  
+  @media (max-width: 768px) {
+    margin: 16px 0 16px 0;
+    
+    span {
+      padding: 0 12px;
+      font-size: 0.9rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    margin: 14px 0 14px 0;
+    
+    span {
+      padding: 0 10px;
+      font-size: 0.85rem;
+    }
   }
 `;
 
@@ -109,72 +197,83 @@ const SocialButton = styled.button`
   gap: 12px;
   cursor: pointer;
   transition: background 0.2s;
+  
   &:hover {
     background: #f0f0f0;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 10px 0;
+    font-size: 0.95rem;
+    gap: 10px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 8px 0;
+    font-size: 0.9rem;
+    gap: 8px;
+  }
+`;
+
+const ErrorMessage = styled.div`
+  color: red;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  
+  @media (max-width: 480px) {
+    font-size: 0.85rem;
+  }
+`;
+
+const SuccessMessage = styled.div`
+  color: green;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  
+  @media (max-width: 480px) {
+    font-size: 0.85rem;
   }
 `;
 
 const Signup = () => {
-  const [email, setEmail] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState("");
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: ""
+  });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [verifying, setVerifying] = useState(false);
   const navigate = useNavigate();
 
-  const handleSendOtp = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    
     try {
-      const response = await fetch('http://localhost:5000/api/send-otp', {
+      const response = await fetch("http://localhost:8000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
+        credentials: "include",
+        body: JSON.stringify(formData)
       });
-      const data = await response.json();
-      if (response.status === 404 && data.message && data.message.includes('User is not registered')) {
-        window.alert('User is not registered. Please sign up first.');
-        navigate('/signup');
-        return;
+      
+      if (response.ok) {
+        setSuccess("Account created successfully!");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
+      } else {
+        const data = await response.json();
+        setError(data.message || "Registration failed");
       }
-      if (!response.ok) {
-        setError(data.message || "Failed to send OTP");
-        return;
-      }
-      setOtpSent(true);
-      setSuccess("OTP sent to your email!");
-    } catch (err) {
-      setError(err.message || "Failed to send OTP. Please try again.");
+    } catch (error) {
+      setError("Registration failed. Please try again.");
     }
   };
 
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-    setVerifying(true);
-    try {
-      const response = await fetch('http://localhost:5000/api/verify-otp', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp })
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        setError(data.message || "Failed to verify OTP");
-        setVerifying(false);
-        return;
-      }
-      setSuccess("Email verified successfully!");
-      setTimeout(() => {
-        navigate("/login");
-      }, 1200);
-    } catch (err) {
-      setError(err.message || "Invalid OTP. Please try again.");
-    }
-    setVerifying(false);
+  const handleGoogleSignup = () => {
+    window.location.href = "http://localhost:8000/api/auth/google";
   };
 
   return (
@@ -183,38 +282,42 @@ const Signup = () => {
       <Container>
         <Card>
           <Title>Create an account</Title>
-          {!otpSent ? (
-            <form style={{ width: "100%" }} onSubmit={handleSendOtp}>
-              <Input
-                type="email"
-                placeholder="Email address"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-              />
-              <ContinueButton type="submit">Continue</ContinueButton>
-            </form>
-          ) : (
-            <form style={{ width: "100%" }} onSubmit={handleVerifyOtp}>
-              <Input
-                type="text"
-                placeholder="Enter OTP"
-                value={otp}
-                onChange={e => setOtp(e.target.value)}
-                required
-              />
-              <ContinueButton type="submit" disabled={verifying}>{verifying ? "Verifying..." : "Verify OTP"}</ContinueButton>
-            </form>
-          )}
-          {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
-          {success && <div style={{ color: 'green', marginBottom: 8 }}>{success}</div>}
+          
+          <form style={{ width: "100%" }} onSubmit={handleSubmit}>
+            <Input
+              type="text"
+              placeholder="Full Name"
+              value={formData.fullName}
+              onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+              required
+            />
+            <Input
+              type="email"
+              placeholder="Email Address"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              required
+            />
+            <Input
+              type="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              required
+            />
+            <ContinueButton type="submit">Create Account</ContinueButton>
+          </form>
+          
+          {error && <ErrorMessage>{error}</ErrorMessage>}
+          {success && <SuccessMessage>{success}</SuccessMessage>}
+          
           <LoginLink>
             Already have an account?
             <a href="#" onClick={e => { e.preventDefault(); navigate("/login"); }}>Log in</a>
           </LoginLink>
           <Divider><span>or</span></Divider>
-          <SocialButton onClick={() => window.location.href = 'http://localhost:8000/api/auth/google'}>
-            <FaGoogle /> Continue with Google
+          <SocialButton onClick={handleGoogleSignup}>
+            <FaGoogle /> Sign up with Google
           </SocialButton>
         </Card>
       </Container>

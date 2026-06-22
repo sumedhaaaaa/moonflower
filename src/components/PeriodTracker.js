@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
@@ -14,6 +14,19 @@ const TrackerContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  
+  @media (max-width: 768px) {
+    width: min(92vw, 640px);
+    height: auto; /* allow height to shrink but keep horizontal layout inside */
+    min-height: 220px;
+    padding: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    width: min(94vw, 560px);
+    padding: 12px;
+    min-height: 200px;
+  }
 `;
 
 const Title = styled.h2`
@@ -21,6 +34,16 @@ const Title = styled.h2`
   font-weight: bold;
   margin-bottom: 22px;
   color: black;
+  
+  @media (max-width: 768px) {
+    font-size: 16px;
+    margin-bottom: 15px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
 `;
 
 const InputsGrid = styled.div`
@@ -30,12 +53,34 @@ const InputsGrid = styled.div`
   text-align: left;
   justify-content: center;
   align-items: center;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr 1fr; /* keep horizontal grouping */
+    gap: 12px 20px;
+  }
+  
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+  }
 `;
 
 const InputWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  
+  @media (max-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 const Label = styled.label`
@@ -44,6 +89,21 @@ const Label = styled.label`
   margin-bottom: 5px;
   text-align: center;
   color: black;
+  
+  @media (max-width: 768px) {
+    font-size: 13px;
+    margin-bottom: 0;
+    margin-right: 10px;
+    text-align: left;
+    flex: 1;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 12px;
+    margin-bottom: 5px;
+    margin-right: 0;
+    text-align: center;
+  }
 `;
 
 const InputField = styled.input`
@@ -53,6 +113,16 @@ const InputField = styled.input`
   width: 120px;
   text-align: center;
   color: black;
+  
+  @media (max-width: 768px) {
+    width: 100px;
+    padding: 10px;
+  }
+  
+  @media (max-width: 480px) {
+    width: 120px;
+    padding: 8px;
+  }
 `;
 
 const Button = styled.button`
@@ -68,9 +138,23 @@ const Button = styled.button`
   justify-content: center;
   margin: auto;
   margin-top: 10px;
+  transition: all 0.2s ease;
 
   &:hover {
     background: #ff3366;
+    transform: translateY(-1px);
+  }
+  
+  @media (max-width: 768px) {
+    padding: 12px 20px;
+    font-size: 16px;
+    margin-top: 15px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 10px 15px;
+    font-size: 14px;
+    margin-top: 10px;
   }
 `;
 
@@ -80,9 +164,57 @@ const SymbolButton = styled.button`
   font-size: 20px;
   cursor: pointer;
   padding: 5px;
+  transition: all 0.2s ease;
 
   &:hover {
     color: #ff3366;
+    transform: scale(1.1);
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 18px;
+    padding: 8px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 16px;
+    padding: 5px;
+  }
+`;
+
+const ButtonRow = styled.div`
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 10px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  
+  @media (max-width: 480px) {
+    gap: 8px;
+    margin-top: 12px;
+  }
+`;
+
+const CounterDisplay = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  
+  @media (max-width: 768px) {
+    font-size: 16px;
+    gap: 15px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 14px;
+    gap: 10px;
   }
 `;
 
@@ -92,6 +224,14 @@ const PeriodTracker = () => {
   const [cycleLength, setCycleLength] = useState(0);
   const [periodLength, setPeriodLength] = useState(0);
   const [monthsToCalculate, setMonthsToCalculate] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/auth/me", { credentials: "include" })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => setIsLoggedIn(!!(data && data.username)))
+      .catch(() => setIsLoggedIn(false));
+  }, []);
 
   const handleChange = (field, action) => {
     if (field === "cycle") {
@@ -104,19 +244,18 @@ const PeriodTracker = () => {
     } else if (field === "period") {
       setPeriodLength(prev => (action === "increase" ? Math.min(prev + 1, 10) : Math.max(prev - 1, 0)));
     } else if (field === "months") {
-      setMonthsToCalculate(prev => (action === "increase" ? Math.min(prev + 1, 12) : Math.max(prev - 1, 0)));
+      setMonthsToCalculate(prev => (action === "increase" ? Math.min(prev + 1, 3) : Math.max(prev - 1, 0)));
     }
   };
 
   const handleSubmit = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8000/api/periods/add", {
+      const response = await fetch("http://localhost:8000/api/periods/add-session", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { "Authorization": `Bearer ${token}` } : {})
         },
+        credentials: "include",
         body: JSON.stringify({ lastPeriod, cycleLength, periodLength, monthsToCalculate }),
       });
       const result = await response.json();
@@ -171,35 +310,38 @@ const PeriodTracker = () => {
 
         <InputWrapper>
           <Label>WHAT'S YOUR USUAL CYCLE LENGTH?</Label>
-          <div>
+          <CounterDisplay>
             <SymbolButton onClick={() => handleChange("cycle", "decrease")}>➖</SymbolButton>
             <span>{cycleLength} days</span>
             <SymbolButton onClick={() => handleChange("cycle", "increase")}>➕</SymbolButton>
-          </div>
+          </CounterDisplay>
         </InputWrapper>
 
         <InputWrapper>
           <Label>HOW LONG DID IT LAST?</Label>
-          <div>
+          <CounterDisplay>
             <SymbolButton onClick={() => handleChange("period", "decrease")}>➖</SymbolButton>
             <span>{periodLength} days</span>
             <SymbolButton onClick={() => handleChange("period", "increase")}>➕</SymbolButton>
-          </div>
+          </CounterDisplay>
         </InputWrapper>
 
         <InputWrapper>
           <Label>NO OF MONTHS TO CALCULATE?</Label>
-          <div>
+          <CounterDisplay>
             <SymbolButton onClick={() => handleChange("months", "decrease")}>➖</SymbolButton>
             <span>{monthsToCalculate} months</span>
             <SymbolButton onClick={() => handleChange("months", "increase")}>➕</SymbolButton>
-          </div>
+          </CounterDisplay>
         </InputWrapper>
       </InputsGrid>
 
-      <Button onClick={handleTrackNow}>
-        TRACK NOW <span style={{ fontSize: "18px", marginLeft: "5px" }}>❤️</span>
-      </Button>
+      <ButtonRow>
+        <Button onClick={handleTrackNow}>TRACK NOW</Button>
+        {isLoggedIn && (
+          <Button onClick={() => navigate("/previous-results")}>LOOK PAST RECORDS</Button>
+        )}
+      </ButtonRow>
     </TrackerContainer>
   );
 };

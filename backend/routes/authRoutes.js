@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
@@ -11,6 +11,37 @@ const authToken = process.env.TWILIO_AUTH_TOKEN;
 const twilioPhone = process.env.TWILIO_PHONE_NUMBER;
 const twilioClient = twilio(accountSid, authToken);
 
+// Registration endpoint (for new account creation)
+router.post("/register", async (req, res) => {
+  try {
+    const { fullName, email, password } = req.body;
+    
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists with this email" });
+    }
+    
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    // Create new user
+    const user = new User({ 
+      username: fullName, 
+      email, 
+      password: hashedPassword 
+    });
+    
+    await user.save();
+    
+    res.json({ message: "User registered successfully" });
+  } catch (error) {
+    console.error("Registration error:", error);
+    res.status(500).json({ message: "Registration failed" });
+  }
+});
+
+// Legacy signup endpoint (keeping for compatibility)
 router.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -21,7 +52,31 @@ router.post("/signup", async (req, res) => {
   res.json({ message: "User registered successfully" });
 });
 
+// Session-based login (for Google OAuth compatibility)
 router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // Set user in session (for session-based auth)
+    req.login(user, (err) => {
+      if (err) {
+        return res.status(500).json({ message: "Login failed" });
+      }
+      res.json({ message: "Login successful", user: { username: user.username, email: user.email, photo: user.photo } });
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Login failed" });
+  }
+});
+
+// JWT-based login (legacy)
+router.post("/login-jwt", async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
 
@@ -31,6 +86,26 @@ router.post("/login", async (req, res) => {
 
   const token = jwt.sign({ userId: user._id }, "your_jwt_secret", { expiresIn: "1h" });
   res.json({ token, userId: user._id, username: user.username });
+});
+
+// Logout endpoint
+router.post("/logout", (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      return res.status(500).json({ message: "Logout failed" });
+    }
+    res.json({ message: "Logout successful" });
+  });
+});
+
+// Get current user info
+router.get("/me", (req, res) => {
+  if (req.isAuthenticated() && req.user) {
+    const { username, email, photo } = req.user;
+    res.json({ username, email, photo });
+  } else {
+    res.status(401).json({ message: "Not authenticated" });
+  }
 });
 
 // Send OTP to phone
