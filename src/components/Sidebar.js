@@ -17,7 +17,12 @@ const SidebarContainer = styled.div`
   position: fixed;
   left: 0;  /* Fix the sidebar to the very left */
   top: 0;
-  z-index: 1000; 
+  z-index: 1000;
+
+  @media (max-width: 480px) {
+    /* ✅ MOBILE: Hide sidebar, replaced by mobile header */
+    display: none;
+  }
 `;
 
 const LogoImage = styled.img`

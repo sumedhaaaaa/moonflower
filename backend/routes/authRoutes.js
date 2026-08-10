@@ -1,10 +1,12 @@
 ﻿const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const passport = require("../config/passport");
 const User = require("../models/User");
 const twilio = require('twilio');
 
 const router = express.Router();
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -67,7 +69,15 @@ router.post("/login", async (req, res) => {
       if (err) {
         return res.status(500).json({ message: "Login failed" });
       }
-      res.json({ message: "Login successful", user: { username: user.username, email: user.email, photo: user.photo } });
+      res.json({
+        message: "Login successful",
+        user: {
+          username: user.username,
+          email: user.email,
+          photo: user.photo,
+          googleId: user.googleId,
+        },
+      });
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -98,11 +108,27 @@ router.post("/logout", (req, res) => {
   });
 });
 
+// Google OAuth
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: `${FRONTEND_URL}/login`,
+  }),
+  (req, res) => {
+    res.redirect(FRONTEND_URL);
+  }
+);
+
 // Get current user info
 router.get("/me", (req, res) => {
   if (req.isAuthenticated() && req.user) {
-    const { username, email, photo } = req.user;
-    res.json({ username, email, photo });
+    const { username, email, photo, googleId } = req.user;
+    res.json({ username, email, photo, googleId });
   } else {
     res.status(401).json({ message: "Not authenticated" });
   }

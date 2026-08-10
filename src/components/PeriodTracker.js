@@ -23,9 +23,13 @@ const TrackerContainer = styled.div`
   }
   
   @media (max-width: 480px) {
-    width: min(94vw, 560px);
-    padding: 12px;
-    min-height: 200px;
+    /* ✅ MOBILE: Full-width card, white background, stacked layout */
+    width: 100%;
+    background: #FFCCE5;
+    padding: 16px;
+    min-height: auto;
+    height: auto;
+    border-radius: 14px;
   }
 `;
 
@@ -41,8 +45,12 @@ const Title = styled.h2`
   }
   
   @media (max-width: 480px) {
-    font-size: 14px;
-    margin-bottom: 12px;
+    /* ✅ MOBILE: Smaller, centered, sentence case */
+    font-size: 13px;
+    margin: 0 0 12px;
+    font-weight: 500;
+    color: #333;
+    text-transform: none;
   }
 `;
 
@@ -60,8 +68,16 @@ const InputsGrid = styled.div`
   }
   
   @media (max-width: 480px) {
+    /* ✅ MOBILE: Single column, full width, stacked vertically */
     grid-template-columns: 1fr 1fr;
-    gap: 10px 12px;
+    gap: 8px;
+    text-align: left;
+    margin-bottom: 10px;
+
+    > :first-child,
+    > :nth-child(4) {
+      grid-column: 1 / -1;
+    }
   }
 `;
 
@@ -78,8 +94,12 @@ const InputWrapper = styled.div`
   }
   
   @media (max-width: 480px) {
+    /* ✅ MOBILE: Column layout, label above, full-width inputs */
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    gap: 0;
   }
 `;
 
@@ -99,10 +119,13 @@ const Label = styled.label`
   }
   
   @media (max-width: 480px) {
-    font-size: 12px;
-    margin-bottom: 5px;
-    margin-right: 0;
-    text-align: center;
+    /* ✅ MOBILE: Muted label, left-aligned, smaller */
+    font-size: 10px;
+    margin: 0 0 4px;
+    text-align: left;
+    color: #993556;
+    font-weight: 500;
+    flex: none;
   }
 `;
 
@@ -120,8 +143,13 @@ const InputField = styled.input`
   }
   
   @media (max-width: 480px) {
-    width: 120px;
+    /* ✅ MOBILE: Full-width, 44px min height */
+    width: 100%;
     padding: 8px;
+    height: auto;
+    margin: 0 0 2px;
+    border-radius: 8px;
+    font-size: 12px;
   }
 `;
 
@@ -152,9 +180,15 @@ const Button = styled.button`
   }
   
   @media (max-width: 480px) {
-    padding: 10px 15px;
-    font-size: 14px;
-    margin-top: 10px;
+    /* ✅ MOBILE: Full-width, 44px min height, stacked */
+    width: 100%;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    margin: 0;
+    height: auto;
+    border-radius: 8px;
+    background: #D4537E;
   }
 `;
 
@@ -165,6 +199,12 @@ const SymbolButton = styled.button`
   cursor: pointer;
   padding: 5px;
   transition: all 0.2s ease;
+  color: #9b4d7b;
+  min-width: 32px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     color: #ff3366;
@@ -177,8 +217,16 @@ const SymbolButton = styled.button`
   }
   
   @media (max-width: 480px) {
-    font-size: 16px;
-    padding: 5px;
+    /* ✅ MOBILE: Circular design, 44px tap target */
+    font-size: 13px;
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    padding: 0;
+    background: transparent;
+    color: #8B7FD1;
+    border-radius: 0;
   }
 `;
 
@@ -195,8 +243,10 @@ const ButtonRow = styled.div`
   }
   
   @media (max-width: 480px) {
-    gap: 8px;
-    margin-top: 12px;
+    /* ✅ MOBILE: Stack vertically, full-width */
+    display: block;
+    margin-top: 0;
+    width: 100%;
   }
 `;
 
@@ -206,6 +256,7 @@ const CounterDisplay = styled.div`
   gap: 10px;
   font-size: 14px;
   font-weight: bold;
+  justify-content: center;
   
   @media (max-width: 768px) {
     font-size: 16px;
@@ -213,8 +264,28 @@ const CounterDisplay = styled.div`
   }
   
   @media (max-width: 480px) {
-    font-size: 14px;
-    gap: 10px;
+    /* ✅ MOBILE: Row layout with muted label on left, stepper controls on right */
+    background: #fff;
+    border-radius: 8px;
+    padding: 6px 8px;
+    gap: 4px;
+    font-size: 12px;
+    justify-content: space-between;
+    width: 100%;
+    
+    span:first-child {
+      flex: 1;
+      text-align: center;
+      color: #333;
+      font-weight: 500;
+      font-size: 12px;
+    }
+  }
+`;
+
+const PreviousResultsButton = styled(Button)`
+  @media (max-width: 480px) {
+    display: none;
   }
 `;
 
@@ -339,7 +410,7 @@ const PeriodTracker = () => {
       <ButtonRow>
         <Button onClick={handleTrackNow}>TRACK NOW</Button>
         {isLoggedIn && (
-          <Button onClick={() => navigate("/previous-results")}>LOOK PAST RECORDS</Button>
+          <PreviousResultsButton onClick={() => navigate("/previous-results")}>LOOK PAST RECORDS</PreviousResultsButton>
         )}
       </ButtonRow>
     </TrackerContainer>

@@ -52,12 +52,7 @@ const ExpertInsights = () => {
   })}
 </ArticleList>
 
-          <NavigationButton position="left" onClick={prevInsight}>
-            ❮
-          </NavigationButton>
-          <NavigationButton position="right" onClick={nextInsight}>
-            ❯
-          </NavigationButton>
+          
         </WhiteBlock>
       </ArticleWrapper>
     </Container>
@@ -72,15 +67,17 @@ export default ExpertInsights;
 
 const Container = styled.div`
   width: 90%;
-  margin: 20px auto;
+  margin: 0 auto;
 
   @media (max-width: 768px) {
     width: 95%;
   }
 
   @media (max-width: 480px) {
+    /* ✅ MOBILE: Full width with minimal padding */
     width: 100%;
-    padding: 5px;
+    margin: 0;
+    padding: 0;
   }
 `;
 
@@ -91,7 +88,14 @@ const ArticleWrapper = styled.div`
   justify-content: space-between;
   background: #ff9cc8;
   border-radius: 15px;
-  padding: 15px;
+  padding: 8px;
+
+  @media (max-width: 480px) {
+    /* ✅ MOBILE: Smaller padding, removed background */
+    background: transparent;
+    padding: 4px 0;
+    border-radius: 0;
+  }
 `;
 
 const WhiteBlock = styled.div`
@@ -100,17 +104,32 @@ const WhiteBlock = styled.div`
   align-items: center;
   justify-content: center;
   border-radius: 15px;
-  padding: 20px;
+  padding: 4px 20px;
   width: 100%;
   overflow: hidden; 
-  flex: 1;  
+  flex: 1;
+
+  @media (max-width: 480px) {
+    /* ✅ MOBILE: Transparent, no padding */
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+  }
 `;
 
 const Title = styled.h2`
   font-size: 1.5em;
   color: #333;
-  margin: 0 auto 10px auto;
+  margin: 0 auto 4px auto;
   text-align: left;
+
+  @media (max-width: 480px) {
+    /* ✅ MOBILE: Left-aligned, smaller, margin adjustment */
+    font-size: 14px;
+    margin-left: 12px;
+    margin-bottom: 4px;
+    color: #333;
+  }
 `;
 
 const ArticleList = styled.div`
@@ -135,31 +154,31 @@ const ArticleList = styled.div`
   }
 
   @media (max-width: 480px) {
-    padding: 10px 40px;
+    /* ✅ MOBILE: Full-width scroll, hide arrows, touch-friendly */
+    padding: 0 12px;
     gap: 10px;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
   }
 `;
 
 const ArticleItem = styled.div`
   min-width: 160px;
   max-width: 200px;
-  height: 90px;
+  height: 72px;
   flex-shrink: 0;
   
   background: white;
-border-radius: 15px;
-
-display: flex;
-align-items: center;
-justify-content: center;
-
-padding: 15px;
-box-sizing: border-box;
-
-text-align: center;
-cursor: pointer;
-
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
   box-sizing: border-box;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
 
   &:hover {
     transform: scale(1.03);
@@ -169,13 +188,27 @@ cursor: pointer;
     color: black;
     text-decoration: none;
     font-weight: bold;
+    font-size: 13px;
   }
 
   scroll-snap-align: center;
   transition: all 0.3s ease;
+
+  @media (max-width: 480px) {
+    /* ✅ MOBILE: Pill-shaped chips */
+    min-width: 140px;
+    max-width: 160px;
+    height: 58px;
+    padding: 8px;
+    border-radius: 20px;
+    background: white;
+
+    a {
+      font-size: 12px;
+      font-weight: 500;
+    }
+  }
 `;
-
-
 
 const NavigationButton = styled.button`
   position: absolute;
@@ -187,10 +220,16 @@ const NavigationButton = styled.button`
   height: 35px;
   cursor: pointer;
   z-index: 10;
+  background: rgba(255, 255, 255, 0.7);
 
   ${props => props.position === "left" ? "left: 5px;" : "right: 5px;"}
 
   &:hover {
     background: rgba(255, 255, 255, 1);
+  }
+
+  @media (max-width: 480px) {
+    /* ✅ MOBILE: Hide navigation buttons */
+    display: none;
   }
 `;

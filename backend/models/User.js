@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema(
     },
     photo: {
       type: String,
+      // Google profile picture URL (lh3.googleusercontent.com)
     },
   },
   { timestamps: true }

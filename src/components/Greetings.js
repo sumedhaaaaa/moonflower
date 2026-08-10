@@ -63,6 +63,11 @@ const GreetingContainer = styled.div`
     margin: 0 auto 15px auto;
     text-align: center;
   }
+
+  @media (max-width: 480px) {
+    /* ✅ MOBILE: Hide greeting (shown in header instead) */
+    display: none;
+  }
 `;
 
 const Greeting = ({ embedded = false }) => {

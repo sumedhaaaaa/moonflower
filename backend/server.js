@@ -109,7 +109,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
 const session = require('express-session');
-const passport = require('passport');
+const passport = require('./config/passport');
 
 app.use(cors({
   origin: "http://localhost:3000", // Allow all origins temporarily for debugging
@@ -143,8 +143,7 @@ mongoose.connect(MONGO_URI, {
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/user");
 const articleRoutes = require("./routes/articleRoutes");
-const periodRoutes = require("./routes/periodRoutes"); // Import the articles route
-const googleAuthRoutes = require('./routes/googleAuth');
+const periodRoutes = require("./routes/periodRoutes");
 
 
 app.get('/', (req, res) => {
@@ -155,7 +154,6 @@ app.use("/api/periods", periodRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/articles", articleRoutes);
-app.use('/api/auth', googleAuthRoutes);
 
 // Update CSP to allow images from self, Google, and data URIs
 app.use((req, res, next) => {

@@ -114,7 +114,7 @@ const FeelingContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
   transition: transform 0.2s ease;
   
   /* 👇 Controls the responsive spacing automatically */
@@ -150,7 +150,80 @@ const FeelingContainer = styled.div`
   }
 
   @media (max-width: 480px) {
-    margin: 6vw auto;
+    /* ✅ MOBILE: Compact horizontal card, white, full-width */
+    width: 100%;
+    height: auto;
+    background-color: #ed98ba; /* soft mobile pink */
+    border-radius: 12px;
+    padding: 12px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.97);
+    margin: 0;
+
+    h3 {
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 0;
+      text-align: left;
+      flex: 1;
+      color: #4B1528;
+      line-height: 1.3;
+    }
+
+    img {
+      width: 28px;
+      height: 28px;
+    }
+
+    p {
+      font-size: 12px;
+      color: #f38eaf;
+      font-weight: 600;
+      margin: 0;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    ${({ $compact }) => $compact && `
+      flex: 1;
+      min-width: 0;
+      height: auto;
+      border-radius: 14px;
+      padding: 14px;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0;
+      box-shadow: none;
+
+      h3 {
+        flex: none;
+        font-size: 11px;
+        font-weight: 400;
+        color: #4B1528;
+        margin: 6px 0 0;
+        text-align: center;
+        line-height: 1.25;
+      }
+
+      img {
+        width: 20px;
+        height: 20px;
+      }
+
+      p {
+        font-size: 10px;
+        color: #D4537E;
+        font-weight: 500;
+        margin: 2px 0 0;
+      }
+
+      &:hover {
+        transform: none;
+      }
+    `}
   }
 `;
 
@@ -290,7 +363,7 @@ const CloseButton = styled.button`
   }
 `;
 
-const FeelingBox = () => {
+const FeelingBox = ({ compact = false }) => {
   const [showPopup, setShowPopup] = useState(false);
 
   // State for input fields
@@ -331,10 +404,10 @@ const FeelingBox = () => {
   return (
     <>
       {/* Main Feeling Box */}
-      <FeelingContainer onClick={openPopup}>
-        <h3>How are you feeling today?</h3>
+      <FeelingContainer $compact={compact} onClick={openPopup}>
+        <h3>{compact ? "How are you feeling?" : "How are you feeling today?"}</h3>
         <img src={require("../assets/heart.png")} alt="Feeling Icon" />
-        <p>Share with us!</p>
+        <p>{compact ? "Share" : "Share with us!"}</p>
       </FeelingContainer>
 
       {/* Pop-up Form */}

@@ -1,6 +1,7 @@
 ﻿import React, { useState } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { FaGoogle } from "react-icons/fa";
 
 const GlobalStyle = createGlobalStyle`
@@ -231,6 +232,7 @@ const SocialButton = styled.button`
 `;
 
 const Login = () => {
+  const { refreshUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -248,6 +250,8 @@ const Login = () => {
       const data = await res.json();
       if (res.ok) {
         alert("Login successful!");
+        // Refresh auth context so the app knows the user is signed in
+        try { refreshUser(); } catch (e) { /* ignore */ }
         navigate("/");
       } else {
         alert(data.message || "Login failed!");
