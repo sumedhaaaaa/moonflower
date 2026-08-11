@@ -4,6 +4,8 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import animation from "../assets/monster.gif";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 // Styled Components
 const CardContainer = styled.div`
   width: 90%;
@@ -271,7 +273,7 @@ const CycleCountdownCard = () => {
         setLoading(true);
         setAuthFailed(false);
         // Login uses Passport sessions, so this request must send its session cookie.
-        const res = await fetch("http://localhost:8000/api/periods/user-session", {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/periods/user-session`, {
           credentials: "include",
         });
         const data = res.ok ? await res.json() : null;

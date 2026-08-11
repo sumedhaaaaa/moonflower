@@ -141,7 +141,7 @@ function Sidebar() {
 
   useEffect(() => {
     // Fetch user info from session-based endpoint
-    fetch("http://localhost:8000/api/auth/me", {
+    fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
       credentials: "include"
     })
       .then(res => res.ok ? res.json() : null)
@@ -166,7 +166,7 @@ function Sidebar() {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/auth/logout", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/logout`, {
         method: "POST",
         credentials: "include"
       });

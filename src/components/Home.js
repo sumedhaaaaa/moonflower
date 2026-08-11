@@ -22,6 +22,7 @@ const GlobalStyle = createGlobalStyle`
     padding: 0;
     box-sizing: border-box;
   }
+
   body {
     background: linear-gradient(to bottom, #F8A6D8, #FF7BAF);
     height: 100dvh;
@@ -35,14 +36,14 @@ const GlobalStyle = createGlobalStyle`
   @media (max-width: 480px) {
     body {
       flex-direction: column;
-      padding: 70px 0 0; /* Space for mobile header */
+      padding: 70px 0 0;
       height: 100dvh;
       overflow: hidden;
     }
   }
 `;
 
-//  NEW: Created a parent container to wrap both HomeContainer and ExpertInsightsContainer
+// Parent container
 const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -115,10 +116,10 @@ const DesktopFeelingBox = styled.div`
   }
 `;
 
-// ✅ NEW MOBILE HEADER: Only visible at max-width: 480px
+// MOBILE HEADER
 const MobileHeader = styled.div`
   display: none;
-  
+
   @media (max-width: 480px) {
     display: flex;
     position: fixed;
@@ -135,10 +136,10 @@ const MobileHeader = styled.div`
   }
 `;
 
-// ✅ Mobile header avatar (left)
+// Mobile header avatar
 const MobileHeaderAvatar = styled.img`
   display: none;
-  
+
   @media (max-width: 480px) {
     display: block;
     width: 28px;
@@ -148,10 +149,10 @@ const MobileHeaderAvatar = styled.img`
   }
 `;
 
-// ✅ Mobile header greeting text (center-left, takes flex space)
+// Mobile header greeting
 const MobileHeaderGreeting = styled.span`
   display: none;
-  
+
   @media (max-width: 480px) {
     display: block;
     font-size: 13px;
@@ -162,10 +163,10 @@ const MobileHeaderGreeting = styled.span`
   }
 `;
 
-// ✅ Mobile header settings icon (right)
+// Mobile header settings
 const MobileHeaderSettings = styled.img`
   display: none;
-  
+
   @media (max-width: 480px) {
     display: block;
     width: 24px;
@@ -176,12 +177,12 @@ const MobileHeaderSettings = styled.img`
   }
 `;
 
-// ✅ MOBILE HERO BANNER: Mascot + tagline (only mobile)
+// MOBILE HERO BANNER
 const MobileHeroBanner = styled.div`
   display: none;
 
   @media (max-width: 480px) {
-    display: flex; /* show hero on mobile */
+    display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
@@ -210,11 +211,11 @@ const MobileHeroBanner = styled.div`
   }
 `;
 
-//  MODIFIED: Home container now takes up available space but doesn't prevent ExpertInsights from being displayed
+// Home container
 const HomeContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  flex: 1; /* Takes available space without restricting ExpertInsights */
+  flex: 1;
   margin-left: 90px;
   padding: 8px 20px 0;
   width: calc(100vw - 120px);
@@ -222,20 +223,18 @@ const HomeContainer = styled.div`
   align-items: flex-start;
   min-height: 0;
   order: 1;
-  
-  
+
   @media (max-width: 1024px) {
     width: calc(100vw - 90px);
     padding: 8px 16px 0;
   }
-  
+
   @media (max-width: 768px) {
     width: calc(100vw - 90px);
     padding: 8px 14px 0;
   }
-  
+
   @media (max-width: 480px) {
-    /* ✅ MOBILE: Remove sidebar margin, take full width, stack vertically */
     margin-left: 0;
     width: 100%;
     padding: 0 8px 0;
@@ -245,12 +244,12 @@ const HomeContainer = styled.div`
   }
 `;
 
-// Left Section (Greeting + GIF)
+// Left Section
 const LeftSection = styled.div`
   display: none;
 `;
 
-// Animation card to align with tracker and feeling box
+// Animation card
 const AnimationBox = styled.div`
   height: 280px;
   width: 240px;
@@ -278,29 +277,28 @@ const AnimationBox = styled.div`
   }
 
   @media (max-width: 480px) {
-    display: none; /* ✅ MOBILE: Hide mascot, shown in hero banner instead */
+    display: none;
   }
 `;
 
-// Center Section (Tracker)
+// Center Section
 const CenterSection = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;   /* ✅ center children */
+  align-items: center;
   width: 100%;
-  max-width: 1200px;     /* ✅ limits width nicely */
-  margin: 0 auto;        /* ✅ centers entire section */
+  max-width: 1200px;
+  margin: 0 auto;
 
   @media (max-width: 1024px) {
     margin-top: 8px;
   }
-  
+
   @media (max-width: 768px) {
     margin-top: 8px;
   }
 
   @media (max-width: 480px) {
-    /* ✅ MOBILE: Full width, no max-width constraint */
     width: 100%;
     max-width: 100%;
   }
@@ -312,13 +310,12 @@ const TrackerContainer = styled.div`
   background-color: rgba(255, 255, 255, 0.8);
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   position: relative;
-  height: 280px; /* match row height on desktop */
+  height: 280px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
 
   @media (max-width: 480px) {
-    /* MOBILE: make this a prominent rounded card like the design */
     width: calc(100% - 24px);
     height: auto;
     padding: 16px;
@@ -329,13 +326,12 @@ const TrackerContainer = styled.div`
   }
 `;
 
-// Row that holds the tracker and the FeelingBox side-by-side on desktop
+// Tracker row
 const TrackerRow = styled.div`
   display: flex;
   align-items: stretch;
   justify-content: center;
   gap: 24px;
-  
 
   @media (max-width: 1024px) {
     flex-direction: column;
@@ -344,16 +340,15 @@ const TrackerRow = styled.div`
   }
 
   @media (max-width: 480px) {
-    /* ✅ MOBILE: Single column, full width */
     flex-direction: column;
     align-items: center;
     gap: 6px;
     width: 100%;
     padding: 0;
-    /* make lightweight white tiles inside tracker look like cards */
+
     & > * {
       width: 100%;
-      background: transparent; /* let child components control their card background */
+      background: transparent;
       border-radius: 12px;
       padding: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.06);
@@ -361,10 +356,10 @@ const TrackerRow = styled.div`
   }
 `;
 
-//  MODIFIED: Expert Insights container now has margin-bottom to ensure visibility
+// Expert Insights container
 const ExpertInsightsContainer = styled.div`
-  margin-left: 90px;                     /* ✅ SAME as HomeContainer */
-  width: calc(100vw - 120px);           /* ✅ SAME width logic */
+  margin-left: 90px;
+  width: calc(100vw - 120px);
   padding: 0 20px 4px;
   text-align: center;
   margin-top: 0;
@@ -382,7 +377,6 @@ const ExpertInsightsContainer = styled.div`
   }
 
   @media (max-width: 480px) {
-    /* ✅ MOBILE: Remove sidebar margin, full width */
     padding-bottom: 12px;
     margin-left: 0;
     width: 100%;
@@ -405,10 +399,10 @@ const MobileFeelingSection = styled.div`
   }
 `;
 
-// ✅ NEW: Cycle Countdown Card container - matches ExpertInsightsContainer styling
+// Cycle Countdown Card container
 const CycleCountdownContainer = styled.div`
-  margin-left: 90px;                     /* ✅ SAME as HomeContainer */
-  width: calc(100vw - 120px);           /* ✅ SAME width logic */
+  margin-left: 90px;
+  width: calc(100vw - 120px);
   padding: 40px 20px;
   margin-top: 0;
   margin-bottom: 0;
@@ -425,7 +419,6 @@ const CycleCountdownContainer = styled.div`
   }
 
   @media (max-width: 480px) {
-    /* ✅ MOBILE: Remove sidebar margin, full width */
     margin-left: 0;
     width: 100%;
     padding: 12px 17px;
@@ -437,34 +430,39 @@ const CycleCountdownContainer = styled.div`
 
 function Home() {
   const navigate = useNavigate();
-  const isLoggedIn = !!localStorage.getItem("token");
   const [hasPeriodData, setHasPeriodData] = useState(false);
   const [user, setUser] = useState(null);
 
+  const isLoggedIn = !!user;
+
   useEffect(() => {
     const fetchPeriodData = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-      try {
-        const res = await fetch("http://localhost:8000/api/periods/user", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setHasPeriodData(data && data.length > 0); // Adjust if your API returns a different structure
-        } else {
-          setHasPeriodData(false);
-        }
-      } catch {
-        setHasPeriodData(false);
+  try {
+    const res = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/periods/user-session`,
+      {
+        credentials: "include"
       }
-    };
+    );
+
+    if (res.ok) {
+      const data = await res.json();
+      setHasPeriodData(data && data.length > 0);
+    } else {
+      setHasPeriodData(false);
+    }
+  } catch {
+    setHasPeriodData(false);
+  }
+};
+
+
     if (isLoggedIn) fetchPeriodData();
   }, [isLoggedIn]);
 
   // Fetch user info for mobile header
   useEffect(() => {
-    fetch("http://localhost:8000/api/auth/me", {
+    fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
       credentials: "include"
     })
       .then(res => res.ok ? res.json() : null)
@@ -476,42 +474,53 @@ function Home() {
 
   const getMobileGreeting = () => {
     const hour = new Date().getHours();
+
     if (hour >= 4 && hour < 12) return "Good Morning";
     if (hour >= 12 && hour < 16) return "Good Afternoon";
     if (hour >= 16 && hour < 20) return "Good Evening";
+
     return "Good Night";
   };
 
   return (
     <>
       <GlobalStyle />
-      {/* ✅ DESKTOP: Show Sidebar (hidden on mobile via Sidebar component's own media query) */}
+
+      {/* DESKTOP: Show Sidebar */}
       <Sidebar />
-      
-      {/* ✅ MOBILE: Fixed header bar at top */}
+
+      {/* MOBILE: Fixed header bar */}
       <MobileHeader>
-        <MobileHeaderAvatar src={require("../assets/profile.png")} alt="Profile" />
+        <MobileHeaderAvatar
+          src={require("../assets/profile.png")}
+          alt="Profile"
+        />
+
         <MobileHeaderGreeting>
           {getMobileGreeting()}
           {user?.username ? `, ${user.username}` : ""}
         </MobileHeaderGreeting>
-        <MobileHeaderSettings src={require("../assets/settings.png")} alt="Settings" />
+
+        <MobileHeaderSettings
+          src={require("../assets/settings.png")}
+          alt="Settings"
+        />
       </MobileHeader>
-      
-      {/*  NEW: Wrapped everything inside MainContainer */}
+
       <MainContainer>
-        
-        {/* Cycle status appears first in the mobile visual order. */}
+
+        {/* Cycle status appears first in the mobile visual order */}
         <CycleCountdownContainer>
           <CycleCountdownCard />
         </CycleCountdownContainer>
 
-        {/*  MODIFIED: HomeContainer now sits inside MainContainer */}
+        {/* Main Home section */}
         <HomeContainer>
-          {/* ✅ Hide greeting on mobile (shown in header instead) */}
-          <Greeting/>
-          
-          {/* ✅ MOBILE: Hero banner with mascot (shown before tracker on mobile) */}
+
+          {/* Greeting */}
+          <Greeting />
+
+          {/* MOBILE: Hero banner */}
           <MobileHeroBanner>
             <img src={animation} alt="Mascot" />
             <p>Track your cycle with ease</p>
@@ -519,38 +528,42 @@ function Home() {
 
           {/* Center Section */}
           <CenterSection>
-            
+
             <TrackerRow>
+
+              {/* Mascot */}
               <AnimationBox>
                 <img src={animation} alt="Heart Animation" />
               </AnimationBox>
+
+              {/* Tracker */}
               <TrackerContainer>
-                {/* Show options only if logged in */}
-                {isLoggedIn && (
-                  <DesktopTrackerButtons>
-                    <button onClick={() => navigate("/tracker-results")}>Track Now</button>
-                    {hasPeriodData && (
-                      <button onClick={() => navigate("/previous-results")}>View Previous Results</button>
-                    )}
-                  </DesktopTrackerButtons>
-                )}
+
                 <PeriodTracker />
+
               </TrackerContainer>
+
+              {/* Feeling Box */}
               <DesktopFeelingBox>
                 <FeelingBox />
               </DesktopFeelingBox>
+
             </TrackerRow>
+
           </CenterSection>
+
         </HomeContainer>
 
-        {/*  MODIFIED: ExpertInsightsContainer is now inside MainContainer but outside HomeContainer */}
+        {/* Expert Insights */}
         <ExpertInsightsContainer>
           <ExpertInsights />
         </ExpertInsightsContainer>
 
+        {/* Mobile Feeling */}
         <MobileFeelingSection>
           <FeelingBox />
         </MobileFeelingSection>
+
       </MainContainer>
     </>
   );

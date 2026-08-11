@@ -10,6 +10,7 @@ const GlobalStyle = createGlobalStyle`
     padding: 0;
     box-sizing: border-box;
   }
+
   body {
     background: linear-gradient(to bottom, #F8A6D8, #FF7BAF);
     min-height: 100vh;
@@ -23,11 +24,11 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   padding: 20px;
-  
+
   @media (max-width: 768px) {
     padding: 15px;
   }
-  
+
   @media (max-width: 480px) {
     padding: 10px;
   }
@@ -36,19 +37,19 @@ const Container = styled.div`
 const LoginCard = styled.div`
   background: white;
   border-radius: 24px;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.25);
   padding: 48px 32px 32px 32px;
   width: 100%;
   max-width: 400px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  
+
   @media (max-width: 768px) {
     padding: 32px 24px 24px 24px;
     max-width: 350px;
   }
-  
+
   @media (max-width: 480px) {
     padding: 24px 16px 16px 16px;
     max-width: 100%;
@@ -61,12 +62,12 @@ const Title = styled.h2`
   font-weight: 600;
   margin-bottom: 32px;
   color: #333;
-  
+
   @media (max-width: 768px) {
     font-size: 1.75rem;
     margin-bottom: 24px;
   }
-  
+
   @media (max-width: 480px) {
     font-size: 1.5rem;
     margin-bottom: 20px;
@@ -79,12 +80,12 @@ const Form = styled.form`
   flex-direction: column;
   gap: 20px;
   margin-bottom: 24px;
-  
+
   @media (max-width: 768px) {
     gap: 16px;
     margin-bottom: 20px;
   }
-  
+
   @media (max-width: 480px) {
     gap: 14px;
     margin-bottom: 18px;
@@ -99,16 +100,16 @@ const Input = styled.input`
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s ease;
-  
+
   &:focus {
     border-color: #ff6699;
   }
-  
+
   @media (max-width: 768px) {
     padding: 12px 14px;
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: 16px;
   }
-  
+
   @media (max-width: 480px) {
     padding: 10px 12px;
   }
@@ -125,16 +126,16 @@ const SubmitButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s ease;
-  
+
   &:hover {
     background: #222;
   }
-  
+
   @media (max-width: 768px) {
     padding: 12px 0;
     font-size: 1rem;
   }
-  
+
   @media (max-width: 480px) {
     padding: 10px 0;
     font-size: 0.95rem;
@@ -146,19 +147,22 @@ const SignupLink = styled.p`
   color: #444;
   text-align: center;
   margin-bottom: 18px;
-  
+
   a {
     color: #007aff;
     text-decoration: none;
     margin-left: 4px;
-    &:hover { text-decoration: underline; }
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
-  
+
   @media (max-width: 768px) {
     font-size: 0.95rem;
     margin-bottom: 16px;
   }
-  
+
   @media (max-width: 480px) {
     font-size: 0.9rem;
     margin-bottom: 14px;
@@ -171,26 +175,26 @@ const Divider = styled.div`
   border-bottom: 1px solid #eee;
   line-height: 0.1em;
   margin: 18px 0 18px 0;
-  
+
   span {
     background: #fff;
     padding: 0 16px;
     color: #888;
     font-size: 0.95rem;
   }
-  
+
   @media (max-width: 768px) {
     margin: 16px 0 16px 0;
-    
+
     span {
       padding: 0 12px;
       font-size: 0.9rem;
     }
   }
-  
+
   @media (max-width: 480px) {
     margin: 14px 0 14px 0;
-    
+
     span {
       padding: 0 10px;
       font-size: 0.85rem;
@@ -213,17 +217,17 @@ const SocialButton = styled.button`
   gap: 12px;
   cursor: pointer;
   transition: background 0.2s;
-  
+
   &:hover {
     background: #f0f0f0;
   }
-  
+
   @media (max-width: 768px) {
     padding: 10px 0;
     font-size: 0.95rem;
     gap: 10px;
   }
-  
+
   @media (max-width: 480px) {
     padding: 8px 0;
     font-size: 0.9rem;
@@ -231,42 +235,65 @@ const SocialButton = styled.button`
   }
 `;
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const Login = () => {
   const { refreshUser } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await fetch("http://localhost:8000/api/auth/login", {
+      const res = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", // Important for session-based auth
-        body: JSON.stringify({ email, password }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email,
+          password,
+        }),
       });
 
       const data = await res.json();
+
       if (res.ok) {
         alert("Login successful!");
-        // Refresh auth context so the app knows the user is signed in
-        try { refreshUser(); } catch (e) { /* ignore */ }
+
+        try {
+          refreshUser();
+        } catch (e) {
+          // Ignore refreshUser errors
+        }
+
         navigate("/");
       } else {
         alert(data.message || "Login failed!");
       }
     } catch (error) {
+      console.error("Login error:", error);
       alert("Login failed! Please try again.");
     }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${API_URL}/api/auth/google`;
   };
 
   return (
     <>
       <GlobalStyle />
+
       <Container>
         <LoginCard>
           <Title>Login</Title>
+
           <Form onSubmit={handleSubmit}>
             <Input
               type="email"
@@ -275,6 +302,7 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
+
             <Input
               type="password"
               placeholder="Password"
@@ -282,14 +310,35 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <SubmitButton type="submit">Login</SubmitButton>
+
+            <SubmitButton type="submit">
+              Login
+            </SubmitButton>
           </Form>
+
           <SignupLink>
-            Don't have an account? <a href="#" onClick={(e) => { e.preventDefault(); navigate("/signup"); }}>Sign up here</a>
+            Don't have an account?
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/signup");
+              }}
+            >
+              Sign up here
+            </a>
           </SignupLink>
-          <Divider><span>or</span></Divider>
-          <SocialButton onClick={() => window.location.href = 'http://localhost:8000/api/auth/google'}>
-            <FaGoogle /> Continue with Google
+
+          <Divider>
+            <span>or</span>
+          </Divider>
+
+          <SocialButton
+            type="button"
+            onClick={handleGoogleLogin}
+          >
+            <FaGoogle />
+            Continue with Google
           </SocialButton>
         </LoginCard>
       </Container>

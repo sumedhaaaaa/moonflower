@@ -74,7 +74,7 @@ const Greeting = ({ embedded = false }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/auth/me", {
+       fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
       credentials: "include"
     })
       .then(res => res.ok ? res.json() : null)

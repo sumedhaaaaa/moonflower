@@ -10,7 +10,7 @@ const ExpertInsights = () => {
 
   // ✅ Fetch articles
   useEffect(() => {
-    fetch("http://localhost:8000/api/articles")
+      fetch(`${process.env.REACT_APP_API_URL}/api/articles`)
       .then(res => res.json())
       .then(data => setArticles(data))
       .catch(err => console.error(err));

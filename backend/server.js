@@ -112,8 +112,8 @@ const session = require('express-session');
 const passport = require('./config/passport');
 
 app.use(cors({
-  origin: "http://localhost:3000", // Allow all origins temporarily for debugging
-  methods: ["GET", "POST"],
+  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
 
@@ -164,6 +164,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.listen(8000, () => {
-  console.log(`Server is listening at http://localhost:8000`);
+const PORT = process.env.PORT || 8000;
+
+app.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
 });

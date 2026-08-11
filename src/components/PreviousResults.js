@@ -285,14 +285,14 @@ const PreviousResults = () => {
 
   const fetchRecords = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/periods/user-session", {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/periods/user-session`, {
         credentials: "include"
       });
       
-      if (response.ok) {
-        const data = await response.json();
+      if (res.ok) {
+        const data = await res.json();
         setRecords(data);
-      } else if (response.status === 401) {
+      } else if (res.status === 401) {
         setError("Please log in to view your records");
       } else {
         setError("Failed to fetch records");

@@ -298,7 +298,7 @@ const PeriodTracker = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/auth/me", { credentials: "include" })
+     fetch(`${process.env.REACT_APP_API_URL}/api/periods/user-session`, { credentials: "include" })
       .then(res => res.ok ? res.json() : null)
       .then(data => setIsLoggedIn(!!(data && data.username)))
       .catch(() => setIsLoggedIn(false));
@@ -321,7 +321,7 @@ const PeriodTracker = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/periods/add-session", {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/periods/user-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
