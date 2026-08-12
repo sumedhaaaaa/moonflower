@@ -1,6 +1,13 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = process.env.REACT_APP_API_URL;
+
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -9,7 +16,17 @@ export function AuthProvider({ children }) {
 
   const refreshUser = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/auth/me`, { credentials: "include" });
+      const token = localStorage.getItem("moonflower_token");
+
+      const res = await fetch(`${API_BASE}/api/auth/me`, {
+        credentials: "include",
+        headers: token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : {},
+      });
+
       if (res.ok) {
         const data = await res.json();
         setUser(data?.username ? data : null);
@@ -24,6 +41,20 @@ export function AuthProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+
+    if (token) {
+      localStorage.setItem("moonflower_token", token);
+
+      // Remove the token from the browser URL
+      window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname
+      );
+    }
+
     refreshUser();
   }, [refreshUser]);
 
@@ -32,10 +63,17 @@ export function AuthProvider({ children }) {
       await fetch(`${API_BASE}/api/auth/logout`, {
         method: "POST",
         credentials: "include",
+        headers: {
+          Authorization: `Bearer ${
+            localStorage.getItem("moonflower_token") || ""
+          }`,
+        },
       });
     } catch {
       // Clear local state even if the request fails.
     }
+
+    localStorage.removeItem("moonflower_token");
     setUser(null);
   }, []);
 
@@ -56,8 +94,10 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
+
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
+
   return context;
 }

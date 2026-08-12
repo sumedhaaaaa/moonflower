@@ -118,19 +118,65 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     failureRedirect: `${FRONTEND_URL}/login`,
+    session: false,
   }),
   (req, res) => {
-    res.redirect(FRONTEND_URL);
+    try {
+      const token = jwt.sign(
+        { userId: req.user._id },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      );
+
+      res.redirect(`${FRONTEND_URL}/?token=${token}`);
+    } catch (error) {
+      console.error("Google JWT error:", error);
+      res.redirect(`${FRONTEND_URL}/login`);
+    }
   }
 );
 
 // Get current user info
-router.get("/me", (req, res) => {
-  if (req.isAuthenticated() && req.user) {
-    const { username, email, photo, googleId } = req.user;
-    res.json({ username, email, photo, googleId });
-  } else {
-    res.status(401).json({ message: "Not authenticated" });
+router.get("/me", async (req, res) => {
+  try {
+    // Check JWT from Authorization header
+    const authHeader = req.headers.authorization;
+
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1];
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      const user = await User.findById(decoded.userId);
+
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+
+      return res.json({
+        username: user.username,
+        email: user.email,
+        photo: user.photo,
+        googleId: user.googleId,
+      });
+    }
+
+    // Keep existing session-based authentication working
+    if (req.isAuthenticated() && req.user) {
+      const { username, email, photo, googleId } = req.user;
+
+      return res.json({
+        username,
+        email,
+        photo,
+        googleId,
+      });
+    }
+
+    return res.status(401).json({ message: "Not authenticated" });
+  } catch (error) {
+    console.error("Auth check error:", error);
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 });
 
