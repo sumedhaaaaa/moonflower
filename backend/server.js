@@ -119,11 +119,19 @@ app.use(cors({
 
 app.use(express.json());
 
+app.set("trust proxy", 1);
+
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'moonflower_secret',
+  secret: process.env.SESSION_SECRET || "moonflower_secret",
   resave: false,
   saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  },
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
