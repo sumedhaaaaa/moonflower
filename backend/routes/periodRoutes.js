@@ -87,26 +87,58 @@ router.get("/user", authenticateToken, async (req, res) => {
 });
 
 // Session-based endpoint for user period records
-router.get("/user-session", (req, res) => {
-  console.log("Session user:", req.user);
-  console.log("Is authenticated:", req.isAuthenticated());
-  
-  if (!req.isAuthenticated() || !req.user) {
-    console.log("User not authenticated");
-    return res.status(401).json({ error: "Not authenticated" });
+// Get user's period records
+// Supports both Passport session authentication and JWT authentication
+router.get("/user-session", async (req, res) => {
+  try {
+    let userId;
+
+    // 1. Check JWT authentication first
+    const authHeader = req.headers.authorization;
+
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1];
+
+      try {
+        const jwt = require("jsonwebtoken");
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        userId = decoded.userId;
+
+        console.log("JWT user ID:", userId);
+      } catch (jwtError) {
+        console.error("JWT verification failed:", jwtError.message);
+        return res.status(401).json({ error: "Invalid or expired token" });
+      }
+    }
+
+    // 2. If no JWT, check Passport session
+    if (!userId && req.isAuthenticated() && req.user) {
+      userId = req.user._id;
+
+      console.log("Session user ID:", userId);
+    }
+
+    // 3. No authentication
+    if (!userId) {
+      console.log("User not authenticated");
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    // 4. Find periods belonging to this user
+    console.log("Looking for periods with userId:", userId);
+
+    const periods = await Period.find({ userId });
+
+    console.log("Found periods:", periods);
+
+    res.json(periods);
+
+  } catch (error) {
+    console.error("Error fetching periods:", error);
+    res.status(500).json({ error: "Server error" });
   }
-  
-  console.log("Looking for periods with userId:", req.user._id);
-  
-  Period.find({ userId: req.user._id })
-    .then(periods => {
-      console.log("Found periods:", periods);
-      res.json(periods);
-    })
-    .catch(err => {
-      console.error("Error fetching periods:", err);
-      res.status(500).json({ error: "Server error" });
-    });
 });
 
 module.exports = router;
