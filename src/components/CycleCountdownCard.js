@@ -253,7 +253,7 @@ const SignInButton = styled.button`
 
 // ===== COMPONENT =====
 const CycleCountdownCard = () => {
-  const { isLoggedIn, loading: authLoading } = useAuth();
+  const { isLoggedIn, loading: authLoading, authFetch } = useAuth();
   const navigate = useNavigate();
   const [periodData, setPeriodData] = useState(null);
   const [cycleInfo, setCycleInfo] = useState(null);
@@ -273,9 +273,7 @@ const CycleCountdownCard = () => {
         setLoading(true);
         setAuthFailed(false);
         // Login uses Passport sessions, so this request must send its session cookie.
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/api/periods/user-session`, {
-          credentials: "include",
-        });
+        const res = await authFetch(`${process.env.REACT_APP_API_URL}/api/periods/user-session`);
         const data = res.ok ? await res.json() : null;
 
         // A stale or invalid session should render the signed-out card,

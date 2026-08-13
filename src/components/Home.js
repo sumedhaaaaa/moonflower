@@ -9,6 +9,7 @@ import FeelingBox from "./FeelingBox";
 import styled, { createGlobalStyle } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { FiCalendar } from "react-icons/fi";
+import {useAuth} from "../context/AuthContext";
 
 // Global style reset
 const GlobalStyle = createGlobalStyle`
@@ -310,7 +311,10 @@ const TrackerContainer = styled.div`
   background-color: rgba(255, 255, 255, 0.8);
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   position: relative;
-  height: 280px;
+  flex: 1;
+  min-width: 0;
+  min-height: 280px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -323,12 +327,14 @@ const TrackerContainer = styled.div`
     margin-bottom: 12px;
     background: rgba(255, 255, 255, 0.95);
     box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    overflow: visible;
   }
 `;
 
 // Tracker row
 const TrackerRow = styled.div`
   display: flex;
+  flex-wrap: wrap;
   align-items: stretch;
   justify-content: center;
   gap: 24px;
@@ -431,18 +437,13 @@ const CycleCountdownContainer = styled.div`
 function Home() {
   const navigate = useNavigate();
   const [hasPeriodData, setHasPeriodData] = useState(false);
-  const [user, setUser] = useState(null);
-
-  const isLoggedIn = !!user;
+  const { user, isLoggedIn, authFetch } = useAuth();
 
   useEffect(() => {
     const fetchPeriodData = async () => {
   try {
-    const res = await fetch(
-      `${process.env.REACT_APP_API_URL}/api/periods/user-session`,
-      {
-        credentials: "include"
-      }
+    const res = await authFetch(
+      `${process.env.REACT_APP_API_URL}/api/periods/user-session`
     );
 
     if (res.ok) {
@@ -461,16 +462,7 @@ function Home() {
   }, [isLoggedIn]);
 
   // Fetch user info for mobile header
-  useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
-      credentials: "include"
-    })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data && data.username) setUser(data);
-      })
-      .catch(() => {});
-  }, []);
+
 
   const getMobileGreeting = () => {
     const hour = new Date().getHours();
@@ -538,6 +530,27 @@ function Home() {
 
               {/* Tracker */}
               <TrackerContainer>
+
+                {/* Show options only if logged in */}
+                {isLoggedIn && (
+                  <DesktopTrackerButtons>
+
+                    <button
+                      onClick={() => navigate("/tracker-results")}
+                    >
+                      Track Now
+                    </button>
+
+                    {hasPeriodData && (
+                      <button
+                        onClick={() => navigate("/previous-results")}
+                      >
+                        View Previous Results
+                      </button>  
+                    )}
+
+                  </DesktopTrackerButtons>
+                )}
 
                 <PeriodTracker />
 

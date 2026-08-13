@@ -4,6 +4,7 @@ import Logo from "../assets/logo.png"; // Website Logo
 import ProfileIcon from "../assets/profile.png"; // Profile Icon
 import SettingsIcon from "../assets/settings.png"; // Settings Icon
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const SidebarContainer = styled.div`
   width: 80px;
@@ -136,20 +137,8 @@ const DropdownArrow = styled.div`
 
 function Sidebar() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const { user, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  useEffect(() => {
-    // Fetch user info from session-based endpoint
-    fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
-      credentials: "include"
-    })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data && data.username) setUser(data);
-      })
-      .catch(() => {});
-  }, []);
 
   const handleSettingsClick = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -165,32 +154,9 @@ function Sidebar() {
   };
 
   const handleLogout = async () => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/logout`, {
-        method: "POST",
-        credentials: "include"
-      });
-      
-      if (response.ok) {
-        setUser(null);
-        setIsDropdownOpen(false);
-        navigate("/");
-        // Don't reload the page, just update the state
-        window.location.reload(); // This will refresh to update the UI
-      } else {
-        console.error("Logout failed:", response.status);
-        // Still try to clear local state even if server logout fails
-        setUser(null);
-        setIsDropdownOpen(false);
-        navigate("/");
-      }
-    } catch (error) {
-      console.error("Logout error:", error);
-      // Fallback: clear local state even if request fails
-      setUser(null);
-      setIsDropdownOpen(false);
-      navigate("/");
-    }
+    await logout();          // clears user + token in shared context — no reload needed
+    setIsDropdownOpen(false);
+    navigate("/");
   };
 
   const handleClickOutside = (e) => {

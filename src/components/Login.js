@@ -266,11 +266,10 @@ const Login = () => {
       if (res.ok) {
         alert("Login successful!");
 
-        try {
-          refreshUser();
-        } catch (e) {
-          // Ignore refreshUser errors
-        }
+        // Remove any leftover Google JWT so it can't override this fresh session login
+        localStorage.removeItem("moonflower_token");
+
+        await refreshUser();   // wait so context has the logged-in user before we navigate
 
         navigate("/");
       } else {

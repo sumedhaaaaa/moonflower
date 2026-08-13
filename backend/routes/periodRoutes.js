@@ -78,7 +78,7 @@ router.get("/", async (req, res) => {
 
 router.get("/user", authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const periods = await Period.find({ userId });
     res.json(periods); // returns an array, empty if no data
   } catch (err) {

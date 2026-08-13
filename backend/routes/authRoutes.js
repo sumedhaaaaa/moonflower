@@ -143,34 +143,29 @@ router.get("/me", async (req, res) => {
     const authHeader = req.headers.authorization;
 
     if (authHeader && authHeader.startsWith("Bearer ")) {
-      const token = authHeader.split(" ")[1];
+      try {
+        const token = authHeader.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.userId);
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      const user = await User.findById(decoded.userId);
-
-      if (!user) {
-        return res.status(401).json({ message: "User not found" });
+        if (user) {
+          return res.json({
+            username: user.username,
+            email: user.email,
+            photo: user.photo,
+            googleId: user.googleId,
+          });
+        }
+        // No user for this token — fall through to session check below
+      } catch (jwtErr) {
+        // Expired/invalid token — fall through to session check instead of failing here
       }
-
-      return res.json({
-        username: user.username,
-        email: user.email,
-        photo: user.photo,
-        googleId: user.googleId,
-      });
     }
 
     // Keep existing session-based authentication working
     if (req.isAuthenticated() && req.user) {
       const { username, email, photo, googleId } = req.user;
-
-      return res.json({
-        username,
-        email,
-        photo,
-        googleId,
-      });
+      return res.json({ username, email, photo, googleId });
     }
 
     return res.status(401).json({ message: "Not authenticated" });

@@ -77,6 +77,20 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
+  // Use this instead of raw fetch() for any request that needs to know who's logged in.
+  // Attaches the JWT (Google login) when one exists, and always sends the session cookie too.
+  const authFetch = useCallback((url, options = {}) => {
+    const token = localStorage.getItem("moonflower_token");
+    return fetch(url, {
+      ...options,
+      credentials: "include",
+      headers: {
+        ...(options.headers || {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -85,6 +99,7 @@ export function AuthProvider({ children }) {
         loading,
         refreshUser,
         logout,
+        authFetch,
       }}
     >
       {children}

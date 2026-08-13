@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useAuth } from "../context/AuthContext";
 
 // Styled components
 const TrackerContainer = styled.div`
@@ -8,27 +9,21 @@ const TrackerContainer = styled.div`
   padding: 20px;
   border-radius: 15px;
   text-align: center;
-  width: 700px;
-  height: 250px;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
   box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  
+
   @media (max-width: 768px) {
-    width: min(92vw, 640px);
-    height: auto; /* allow height to shrink but keep horizontal layout inside */
-    min-height: 220px;
     padding: 16px;
   }
-  
+
   @media (max-width: 480px) {
-    /* ✅ MOBILE: Full-width card, white background, stacked layout */
-    width: 100%;
     background: #FFCCE5;
     padding: 16px;
-    min-height: auto;
-    height: auto;
     border-radius: 14px;
   }
 `;
@@ -38,12 +33,12 @@ const Title = styled.h2`
   font-weight: bold;
   margin-bottom: 22px;
   color: black;
-  
+
   @media (max-width: 768px) {
     font-size: 16px;
     margin-bottom: 15px;
   }
-  
+
   @media (max-width: 480px) {
     /* ✅ MOBILE: Smaller, centered, sentence case */
     font-size: 13px;
@@ -61,14 +56,13 @@ const InputsGrid = styled.div`
   text-align: left;
   justify-content: center;
   align-items: center;
-  
+
   @media (max-width: 768px) {
-    grid-template-columns: 1fr 1fr; /* keep horizontal grouping */
+    grid-template-columns: 1fr 1fr;
     gap: 12px 20px;
   }
-  
+
   @media (max-width: 480px) {
-    /* ✅ MOBILE: Single column, full width, stacked vertically */
     grid-template-columns: 1fr 1fr;
     gap: 8px;
     text-align: left;
@@ -85,16 +79,15 @@ const InputWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  
+
   @media (max-width: 768px) {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     width: 100%;
   }
-  
+
   @media (max-width: 480px) {
-    /* ✅ MOBILE: Column layout, label above, full-width inputs */
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
@@ -109,7 +102,7 @@ const Label = styled.label`
   margin-bottom: 5px;
   text-align: center;
   color: black;
-  
+
   @media (max-width: 768px) {
     font-size: 13px;
     margin-bottom: 0;
@@ -117,9 +110,8 @@ const Label = styled.label`
     text-align: left;
     flex: 1;
   }
-  
+
   @media (max-width: 480px) {
-    /* ✅ MOBILE: Muted label, left-aligned, smaller */
     font-size: 10px;
     margin: 0 0 4px;
     text-align: left;
@@ -136,14 +128,13 @@ const InputField = styled.input`
   width: 120px;
   text-align: center;
   color: black;
-  
+
   @media (max-width: 768px) {
     width: 100px;
     padding: 10px;
   }
-  
+
   @media (max-width: 480px) {
-    /* ✅ MOBILE: Full-width, 44px min height */
     width: 100%;
     padding: 8px;
     height: auto;
@@ -172,15 +163,14 @@ const Button = styled.button`
     background: #ff3366;
     transform: translateY(-1px);
   }
-  
+
   @media (max-width: 768px) {
     padding: 12px 20px;
     font-size: 16px;
     margin-top: 15px;
   }
-  
+
   @media (max-width: 480px) {
-    /* ✅ MOBILE: Full-width, 44px min height, stacked */
     width: 100%;
     padding: 10px;
     font-size: 12px;
@@ -210,14 +200,13 @@ const SymbolButton = styled.button`
     color: #ff3366;
     transform: scale(1.1);
   }
-  
+
   @media (max-width: 768px) {
     font-size: 18px;
     padding: 8px;
   }
-  
+
   @media (max-width: 480px) {
-    /* ✅ MOBILE: Circular design, 44px tap target */
     font-size: 13px;
     width: 18px;
     height: 18px;
@@ -235,15 +224,14 @@ const ButtonRow = styled.div`
   gap: 16px;
   justify-content: center;
   margin-top: 10px;
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     gap: 10px;
     margin-top: 15px;
   }
-  
+
   @media (max-width: 480px) {
-    /* ✅ MOBILE: Stack vertically, full-width */
     display: block;
     margin-top: 0;
     width: 100%;
@@ -257,14 +245,13 @@ const CounterDisplay = styled.div`
   font-size: 14px;
   font-weight: bold;
   justify-content: center;
-  
+
   @media (max-width: 768px) {
     font-size: 16px;
     gap: 15px;
   }
-  
+
   @media (max-width: 480px) {
-    /* ✅ MOBILE: Row layout with muted label on left, stepper controls on right */
     background: #fff;
     border-radius: 8px;
     padding: 6px 8px;
@@ -272,7 +259,7 @@ const CounterDisplay = styled.div`
     font-size: 12px;
     justify-content: space-between;
     width: 100%;
-    
+
     span:first-child {
       flex: 1;
       text-align: center;
@@ -291,26 +278,19 @@ const PreviousResultsButton = styled(Button)`
 
 const PeriodTracker = () => {
   const navigate = useNavigate();
+  const { isLoggedIn, authFetch } = useAuth();
   const [lastPeriod, setLastPeriod] = useState("");
   const [cycleLength, setCycleLength] = useState(0);
   const [periodLength, setPeriodLength] = useState(0);
   const [monthsToCalculate, setMonthsToCalculate] = useState(0);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-     fetch(`${process.env.REACT_APP_API_URL}/api/periods/user-session`, { credentials: "include" })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => setIsLoggedIn(!!(data && data.username)))
-      .catch(() => setIsLoggedIn(false));
-  }, []);
 
   const handleChange = (field, action) => {
     if (field === "cycle") {
       setCycleLength((prev) => {
         let newCycleLength = action === "increase" ? prev + 1 : prev - 1;
-        if (newCycleLength < 21) return 21; // Prevent going below 21
-        if (newCycleLength > 35) return 35; // Prevent going above 35
-        return newCycleLength; // Update state only if within range
+        if (newCycleLength < 21) return 21;
+        if (newCycleLength > 35) return 35;
+        return newCycleLength;
       });
     } else if (field === "period") {
       setPeriodLength(prev => (action === "increase" ? Math.min(prev + 1, 10) : Math.max(prev - 1, 0)));
@@ -321,24 +301,22 @@ const PeriodTracker = () => {
 
   const handleSubmit = async () => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/periods/user-session`, {
+      const res = await authFetch(`${process.env.REACT_APP_API_URL}/api/periods/user-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify({ lastPeriod, cycleLength, periodLength, monthsToCalculate }),
       });
-      const result = await response.json();
+      const result = await res.json();
       console.log("Server response:", result);
-      if (!response.ok) {
+      if (!res.ok) {
         throw new Error(result.error || "Something went wrong");
       }
     } catch (error) {
       console.error("Error submitting data:", error);
     }
   };
-  
 
   const handleTrackNow = () => {
     if (!lastPeriod) {
@@ -349,23 +327,6 @@ const PeriodTracker = () => {
     handleSubmit();
 
     const lastPeriodDate = new Date(lastPeriod);
-    const validMonths = Math.max(monthsToCalculate, 1);
-    let predictions = [];
-
-    // for (let i = 0; i < validMonths; i++) {
-    //   let nextCycleStart = new Date(lastPeriodDate);
-    //   nextCycleStart.setDate(lastPeriodDate.getDate() + cycleLength * (i + 1));
-
-    //   let nextCycleEnd = new Date(nextCycleStart);
-    //   nextCycleEnd.setDate(nextCycleStart.getDate() + periodLength);
-
-    //   predictions.push({
-    //     start: nextCycleStart.toISOString().split("T")[0],
-    //     end: nextCycleEnd.toISOString().split("T")[0],
-
-    //   });
-    // }
-    console.log(lastPeriodDate);
     navigate("/tracker-results", { state: { lastPeriodDate, cycleLength, periodLength, monthsToCalculate } });
   };
 
