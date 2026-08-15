@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -275,6 +276,7 @@ const Loading = styled.div`
 
 const PreviousResults = () => {
   const navigate = useNavigate();
+  const { authFetch } = useAuth();
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -284,25 +286,26 @@ const PreviousResults = () => {
   }, []);
 
   const fetchRecords = async () => {
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/periods/user-session`, {
-        credentials: "include"
-      });
-      
-      if (res.ok) {
-        const data = await res.json();
-        setRecords(data);
-      } else if (res.status === 401) {
-        setError("Please log in to view your records");
-      } else {
-        setError("Failed to fetch records");
-      }
-    } catch (err) {
-      setError("Error loading records");
-    } finally {
-      setLoading(false);
+  try {
+    const res = await authFetch(
+      `${process.env.REACT_APP_API_URL}/api/periods/user-session`
+    );
+
+    if (res.ok) {
+      const data = await res.json();
+      setRecords(data);
+    } else if (res.status === 401) {
+      setError("Please log in to view your records");
+    } else {
+      setError("Failed to fetch records");
     }
-  };
+  } catch (err) {
+    console.error("Error loading records:", err);
+    setError("Error loading records");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {

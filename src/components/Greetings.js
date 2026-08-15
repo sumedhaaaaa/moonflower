@@ -70,19 +70,7 @@ const GreetingContainer = styled.div`
   }
 `;
 
-const Greeting = ({ embedded = false }) => {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-       fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
-      credentials: "include"
-    })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data && data.username) setUser(data);
-      })
-      .catch(() => {});
-  }, []);
+const Greeting = ({ embedded = false, username }) => {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -95,7 +83,7 @@ const Greeting = ({ embedded = false }) => {
   return (
     <GreetingContainer embedded={embedded}>
       {getGreeting()}
-      {user?.username ? `, ${user.username}` : ""}
+      {username ? `, ${username}` : ""}
     </GreetingContainer>
   );
 };

@@ -510,7 +510,7 @@ function Home() {
         <HomeContainer>
 
           {/* Greeting */}
-          <Greeting />
+          <Greeting username={user?.username} />
 
           {/* MOBILE: Hero banner */}
           <MobileHeroBanner>
@@ -530,30 +530,7 @@ function Home() {
 
               {/* Tracker */}
               <TrackerContainer>
-
-                {/* Show options only if logged in */}
-                {isLoggedIn && (
-                  <DesktopTrackerButtons>
-
-                    <button
-                      onClick={() => navigate("/tracker-results")}
-                    >
-                      Track Now
-                    </button>
-
-                    {hasPeriodData && (
-                      <button
-                        onClick={() => navigate("/previous-results")}
-                      >
-                        View Previous Results
-                      </button>  
-                    )}
-
-                  </DesktopTrackerButtons>
-                )}
-
                 <PeriodTracker />
-
               </TrackerContainer>
 
               {/* Feeling Box */}
