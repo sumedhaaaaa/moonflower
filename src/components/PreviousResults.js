@@ -282,30 +282,30 @@ const PreviousResults = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchRecords();
-  }, []);
-
   const fetchRecords = async () => {
-  try {
-    const res = await authFetch(
-      `${process.env.REACT_APP_API_URL}/api/periods/user-session`
-    );
+    try {
+      const res = await authFetch(
+        `${process.env.REACT_APP_API_URL}/api/periods/user-session`
+      );
 
-    if (res.ok) {
-      const data = await res.json();
-      setRecords(data);
-    } else if (res.status === 401) {
-      setError("Please log in to view your records");
-    } else {
-      setError("Failed to fetch records");
+      if (res.ok) {
+        const data = await res.json();
+        setRecords(data);
+      } else if (res.status === 401) {
+        setError("Please log in to view your records");
+      } else {
+        setError("Failed to fetch records");
+      }
+    } catch (err) {
+      console.error("Error loading records:", err);
+      setError("Error loading records");
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("Error loading records:", err);
-    setError("Error loading records");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
+
+  fetchRecords();
+}, [authFetch]);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
