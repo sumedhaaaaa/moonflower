@@ -111,8 +111,29 @@ const app = express();
 const session = require('express-session');
 const passport = require('./config/passport');
 
+const frontendOrigins = [
+  process.env.FRONTEND_URL || "http://localhost:3000",
+  ...(process.env.ADDITIONAL_FRONTEND_URLS || "")
+    .split(",")
+    .map((url) => url.trim())
+    .filter(Boolean),
+].map((url) => {
+  try {
+    return new URL(url).origin;
+  } catch {
+    return null;
+  }
+}).filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  origin(origin, callback) {
+    // Requests without an Origin header are server-to-server or direct browser navigations.
+    if (!origin || frontendOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Origin is not allowed by CORS"));
+  },
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));

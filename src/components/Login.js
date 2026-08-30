@@ -282,7 +282,7 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `${API_URL}/api/auth/google`;
+    window.location.href = `${API_URL}/api/auth/google?returnTo=${encodeURIComponent(window.location.origin)}`;
   };
 
   return (

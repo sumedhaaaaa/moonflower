@@ -7,6 +7,28 @@ const twilio = require('twilio');
 
 const router = express.Router();
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+const allowedFrontendUrls = [
+  FRONTEND_URL,
+  ...(process.env.ADDITIONAL_FRONTEND_URLS || "")
+    .split(",")
+    .map((url) => url.trim())
+    .filter(Boolean),
+].map((url) => {
+  try {
+    return new URL(url).origin;
+  } catch {
+    return null;
+  }
+}).filter(Boolean);
+
+const getFrontendUrl = (candidate) => {
+  try {
+    const origin = new URL(candidate).origin;
+    return allowedFrontendUrls.includes(origin) ? origin : FRONTEND_URL;
+  } catch {
+    return FRONTEND_URL;
+  }
+};
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -109,30 +131,39 @@ router.post("/logout", (req, res) => {
 });
 
 // Google OAuth
-router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
+router.get("/google", (req, res, next) => {
+  // Store the approved frontend in the OAuth session so the callback returns
+  // the user to the same app instance that started the login.
+  req.session.oauthFrontendUrl = getFrontendUrl(req.query.returnTo);
+  passport.authenticate("google", { scope: ["profile", "email"] })(req, res, next);
+});
 
 router.get(
   "/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: `${FRONTEND_URL}/login`,
-    session: false,
-  }),
-  (req, res) => {
-    try {
-      const token = jwt.sign(
-        { userId: req.user._id },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
-      );
+  (req, res, next) => {
+    const frontendUrl = getFrontendUrl(req.session.oauthFrontendUrl);
 
-      res.redirect(`${FRONTEND_URL}/?token=${token}`);
-    } catch (error) {
-      console.error("Google JWT error:", error);
-      res.redirect(`${FRONTEND_URL}/login`);
-    }
+    passport.authenticate("google", { session: false }, (authError, user) => {
+      delete req.session.oauthFrontendUrl;
+
+      if (authError || !user) {
+        if (authError) console.error("Google OAuth error:", authError);
+        return res.redirect(`${frontendUrl}/login`);
+      }
+
+      try {
+        const token = jwt.sign(
+          { userId: user._id },
+          process.env.JWT_SECRET,
+          { expiresIn: "1h" }
+        );
+
+        res.redirect(`${frontendUrl}/?token=${encodeURIComponent(token)}`);
+      } catch (error) {
+        console.error("Google JWT error:", error);
+        res.redirect(`${frontendUrl}/login`);
+      }
+    })(req, res, next);
   }
 );
 
