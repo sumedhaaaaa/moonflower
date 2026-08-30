@@ -14,8 +14,11 @@ import {useAuth} from "../context/AuthContext";
 // Global style reset
 const GlobalStyle = createGlobalStyle`
   html, body, #root {
-    height: 100%;
-    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
   }
 
   * {
@@ -26,36 +29,28 @@ const GlobalStyle = createGlobalStyle`
 
   body {
     background: linear-gradient(to bottom, #F8A6D8, #FF7BAF);
-    height: 100dvh;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
-  /* ✅ MOBILE: Hide sidebar at 480px breakpoint */
   @media (max-width: 480px) {
     body {
-      flex-direction: column;
       padding: 70px 0 0;
-      height: 100dvh;
-      overflow: hidden;
+      min-height: 100dvh;
     }
   }
 `;
-
 // Parent container
 const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
   width: 100%;
-  overflow: hidden;
+  min-height: 100dvh;
+  overflow-x: hidden;
 
   @media (max-width: 480px) {
-    overflow-y: auto;
-    overflow-x: hidden;
+    min-height: calc(100dvh - 70px);
   }
 `;
 
@@ -216,7 +211,6 @@ const MobileHeroBanner = styled.div`
 const HomeContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  flex: 1;
   margin-left: 90px;
   padding: 8px 20px 0;
   width: calc(100vw - 120px);
@@ -371,6 +365,7 @@ const ExpertInsightsContainer = styled.div`
   margin-top: 0;
   margin-bottom: 20px;
   order: 3;
+  flex-shrink: 0;
 
   @media (max-width: 1024px) {
     width: calc(100vw - 90px);
